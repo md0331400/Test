@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello Beautiful! ❤️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>KothaBolbo</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts (Exo 2) -->
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,210 +16,1108 @@
         }
 
         body {
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(ellipse at center, #0f172a 0%, #020617 100%);
             height: 100vh;
-            overflow: hidden;
-            font-family: 'Poppins', sans- serif;
-            padding: 20px;
-        }
-
-        /* ব্যাকগ্রাউন্ড হার্ট অ্যানিমেশন */
-        .hearts {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .hearts li {
-            position: absolute;
-            list-style: none;
-            display: block;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 75, 110, 0.2);
-            animation: animate 25s linear infinite;
-            bottom: -150px;
-            border-radius: 50%;
-        }
-
-        @keyframes animate {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 50%; }
-            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 10%; }
-        }
-
-        .hearts li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
-        .hearts li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
-        .hearts li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
-        .hearts li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
-        .hearts li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
-        .hearts li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(255, 75, 110, 0.2);
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-            border: 2px solid #ffdeeb;
-            backdrop-filter: blur(5px);
-            animation: cardPop 0.5s ease-out;
-        }
-
-        @keyframes cardPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .img-container {
-            font-size: 70px;
-            margin-bottom: 20px;
-            animation: heartBeat 1.5s infinite;
-        }
-
-        @keyframes heartBeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        h1 {
-            color: #ff477e;
-            font-family: 'Pacifico', cursive;
-            font-size: 36px;
-            margin-bottom: 35px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .btn-container {
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 25px;
-            flex-wrap: wrap;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
         }
 
-        button {
-            padding: 15px 45px;
-            font-size: 18px;
+        /* ========================================
+           SPLASH SCREEN
+        ======================================== */
+        #splashScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, #0f172a 0%, #020617 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        #splashScreen.hide {
+            opacity: 0;
+            transform: scale(1.04);
+            pointer-events: none;
+        }
+
+        .splash {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            animation: splashFadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .splash-logo-wrap {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-rings {
+            position: absolute;
+            top: 50%; left: 50%;
+            pointer-events: none;
+            width: 100px; height: 100px;
+            margin-top: -50px; margin-left: -50px;
+        }
+
+        .splash-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            top: 50%; left: 50%;
+            animation: ring-spin 3s linear infinite;
+        }
+
+        .splash-ring:nth-child(1) {
+            width: 100px; height: 100px;
+            margin-top: -50px; margin-left: -50px;
+            border-top-color: #00d4ff;
+            border-right-color: rgba(0, 212, 255, 0.3);
+            animation-duration: 2.2s;
+        }
+
+        .splash-ring:nth-child(2) {
+            width: 85px; height: 85px;
+            margin-top: -42px; margin-left: -42px;
+            border-bottom-color: #7c3aed;
+            border-left-color: rgba(124, 58, 237, 0.3);
+            animation-duration: 2.8s;
+            animation-direction: reverse;
+        }
+
+        .splash-ring:nth-child(3) {
+            width: 70px; height: 70px;
+            margin-top: -35px; margin-left: -35px;
+            border-top-color: #00d4ff;
+            border-left-color: rgba(124, 58, 237, 0.4);
+            animation-duration: 3.6s;
+        }
+
+        @keyframes ring-spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .splash-particles {
+            position: absolute;
+            width: 120px; height: 120px;
+            animation: particles-rotate 10s linear infinite;
+            top: 50%; left: 50%;
+            margin-top: -60px; margin-left: -60px;
+            pointer-events: none;
+        }
+
+        .splash-particles::before,
+        .splash-particles::after {
+            content: '';
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .splash-particles::before {
+            top: 0; left: 50%; margin-left: -2px;
+            background: #00d4ff; color: #00d4ff;
+        }
+
+        .splash-particles::after {
+            bottom: 0; left: 50%; margin-left: -2px;
+            background: #7c3aed; color: #7c3aed;
+        }
+
+        @keyframes particles-rotate {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .splash-bubble {
+            width: 70px; height: 70px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-radius: 50% 50% 50% 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), 0 0 60px rgba(124, 58, 237, 0.3);
+            animation: bubble-float 2.4s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        .splash-bubble i {
+            font-size: 28px;
+            color: #fff;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            margin-left: 3px;
+        }
+
+        @keyframes bubble-float {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-5px); }
+        }
+
+        .splash-title {
+            font-family: 'Exo 2', 'Segoe UI', system-ui, sans-serif;
+            font-size: 2.2rem;
             font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 3px;
+            filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.6));
+            animation: title-pulse 2.2s ease-in-out infinite alternate;
+            margin-top: 6px;
+        }
+
+        @keyframes title-pulse {
+            from { filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5)); }
+            to   { filter: drop-shadow(0 0 22px rgba(124, 58, 237, 0.8)); }
+        }
+
+        .splash-sub {
+            font-size: 0.7rem;
+            color: #b0c4de;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            animation: fade-sub 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fade-sub {
+            0%   { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes splashFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        /* ========================================
+           WEBVIEW / MAIN APP
+        ======================================== */
+        .webview-container {
+            width: 100%;
+            height: 100vh;
             border: none;
-            border-radius: 50px;
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1;
+        }
+
+        .webview-container.active {
+            display: block;
+        }
+
+        /* ========================================
+           OFFLINE SCREEN
+        ======================================== */
+        .offline-container {
+            max-width: 400px;
+            width: 100%;
+            background: transparent;
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+            z-index: 10;
+        }
+
+        .offline-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .offline-content {
+            background: linear-gradient(135deg, #1a2847 0%, #0f1729 100%);
+            border: 2px solid #2d4a7d;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .status-icon {
+            width: 80px; height: 80px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8c42);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.6; }
+        }
+
+        .offline-container h2 {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .offline-container .message {
+            font-size: 16px;
+            color: #b0bcc8;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .offline-container .sub-message {
+            font-size: 14px;
+            color: #7a8fa0;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .offline-waiting {
+            font-size: 13px;
+            color: #4a6fa0;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            animation: fade-sub 2s ease-in-out infinite alternate;
+        }
+
+        /* ========================================
+           UPDATE MODAL
+        ======================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 41, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeInOverlay 0.3s ease;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a2847 0%, #0f1729 100%);
+            border: 2px solid #2d4a7d;
+            border-radius: 25px;
+            padding: 40px 30px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.7);
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 70px; height: 70px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #ff9800, #ff6f00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            font-size: 14px;
+            color: #b0bcc8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Red message style */
+        .update-red-message {
+            color: #ff4444 !important;
+            font-size: 15px !important;
+            font-weight: 600;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px !important;
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { border-color: rgba(255, 68, 68, 0.3); }
+            50%       { border-color: rgba(255, 68, 68, 0.7); box-shadow: 0 0 15px rgba(255, 68, 68, 0.2); }
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .btn-close {
+            padding: 14px 24px;
+            background: rgba(45, 74, 125, 0.5);
+            color: #b0bcc8;
+            border: 1px solid #2d4a7d;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            font-family: 'Poppins', sans-serif;
         }
 
-        .btn-yes {
-            background: linear-gradient(45deg, #ff477e, #ff85a2);
-            color: white;
+        .btn-close:active { background: rgba(45, 74, 125, 0.7); transform: scale(0.97); }
+        .btn-close:hover  { background: rgba(45, 74, 125, 0.6); color: #ffffff; }
+
+        /* ========================================
+           STATUS INDICATOR
+        ======================================== */
+        .status-indicator {
+            position: fixed;
+            top: 15px; right: 15px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            z-index: 900;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
         }
 
-        .btn-yes:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 71, 126, 0.5);
+        .status-indicator.online {
+            background: #51cf66;
+            box-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
         }
 
-        .btn-no {
-            background-color: #f1f2f6;
-            color: #57606f;
-        }
-
-        .btn-no:hover {
-            background-color: #dfe4ea;
-        }
-
-        /* নো পেজের স্টাইল */
-        .no-page {
+        /* ========================================
+           DEBUG CONSOLE
+        ======================================== */
+        .debug-console {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 41, 0.98);
+            color: #2d7bff;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
             display: none;
+            z-index: 5000;
+            font-size: 10px;
+            font-family: monospace;
+            border-top: 2px solid #2d4a7d;
         }
 
-        .broken-heart {
-            font-size: 70px;
-            color: #747d8c;
-            margin-bottom: 20px;
+        .debug-console.show { display: block; }
+
+        .debug-line {
+            margin: 3px 0;
+            word-break: break-all;
         }
 
-        .no-page h1 {
-            color: #57606f;
-            font-family: 'Poppins', sans-serif;
-            font-size: 28px;
-            margin-bottom: 15px;
+        .debug-close {
+            position: absolute;
+            top: 5px; right: 10px;
+            color: #2d7bff;
+            cursor: pointer;
+            font-size: 14px;
         }
 
-        .cry-emoji {
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-
-        .reason {
-            background: #fff0f3;
-            padding: 20px;
-            border-radius: 15px;
-            color: #ff477e;
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1.6;
-            border-left: 5px solid #ff85a2;
-            margin-bottom: 15px;
-        }
-
-        .redirect-text {
-            font-size: 13px;
-            color: #a4b0be;
-            font-style: italic;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <ul class="hearts">
-        <li></li><li></li><li></li><li></li><li></li><li></li>
-    </ul>
-
-    <div class="card" id="mainPage">
-        <div class="img-container">💖</div>
-        <h1>Are you love me?</h1>
-        <div class="btn-container">
-            <button class="btn-yes" onclick="selectYes()">Yes, I Do!</button>
-            <button class="btn-no" onclick="selectNo()">No...</button>
+    <!-- ========================================
+         SPLASH SCREEN
+    ======================================== -->
+    <div id="splashScreen">
+        <div class="splash">
+            <div class="splash-logo-wrap">
+                <div class="splash-rings">
+                    <div class="splash-ring"></div>
+                    <div class="splash-ring"></div>
+                    <div class="splash-ring"></div>
+                </div>
+                <div class="splash-particles"></div>
+                <div class="splash-bubble">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+            </div>
+            <div class="splash-title">Kotha Bolbo</div>
+            <div class="splash-sub">Created by Sayem</div>
         </div>
     </div>
 
-    <div class="card no-page" id="noPage">
-        <div class="broken-heart">💔</div>
-        <h1>Oh No...!</h1>
-        <div class="cry-emoji">😭😭😭</div>
-        <div class="reason">
-            আমি ভাবতেই পারছি না তুমি আমাকে না বলে দিলে! আমার মনটা পুরোপুরি ভেঙে গেল। 🥺
+    <!-- Hidden Audio Element for Offline Sound -->
+    <audio id="offlineSound" preload="auto" style="display: none;">
+        <source src="sound/offlinesound.mp3" type="audio/mpeg">
+        <source src="sound/offlinesound.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Status Indicator -->
+    <div class="status-indicator" id="statusIndicator"></div>
+
+    <!-- Update Modal -->
+    <div class="modal-overlay" id="updateModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h3>App Update Required</h3>
+            <p>Your app is not updated. Please use the updated app to continue.</p>
+            <p class="update-red-message">Please Download latest app from Sayem WebStore</p>
+            <div class="modal-buttons">
+                <button class="btn-close" onclick="handleClose()">Close App</button>
+            </div>
         </div>
-        <p class="redirect-text">Redirecting in a moment...</p>
+    </div>
+
+    <!-- Webview (fixed URL) -->
+    <iframe
+        class="webview-container"
+        id="webviewContainer"
+        src="about:blank"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation"
+    ></iframe>
+
+    <!-- Offline Page -->
+    <div class="offline-container" id="offlineContainer">
+        <div class="offline-content">
+            <div class="status-icon">📡</div>
+            <h2>No Internet Connection</h2>
+            <div class="message">It appears you are offline</div>
+            <div class="sub-message">Please check your internet connection. The app will automatically reconnect when you're back online.</div>
+            <div class="offline-waiting">Waiting for connection...</div>
+        </div>
+    </div>
+
+    <!-- Debug Console -->
+    <div class="debug-console" id="debugConsole">
+        <span class="debug-close" onclick="toggleDebug()">×</span>
+        <div id="debugContent"></div>
     </div>
 
     <script>
-        // Yes ক্লিক করলে আপনার দেওয়া মূল লিংকে যাবে
-        function selectYes() {
-            window.location.href = "https://casajoys.com/mfac6yd6";
-        }
+        // ========================================
+        // Configuration
+        // ========================================
+        const APP_CONFIG = {
+            // CSV URL from Google Sheet
+            csv_url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQuj1VPuVGxBC4pbo-2gd8rhiyci_6LJ-qUd1DNt607uPrbSrk4s3mDjTky3uBXPiQWFrtOE71JK_Kn/pub?gid=0&single=true&output=csv",
 
-        // No ক্লিক করলে ইমোশনাল পেজ দেখাবে এবং ৩ সেকেন্ড পর অন্য লিংকে যাবে
-        function selectNo() {
-            document.getElementById('mainPage').style.display = 'none';
-            document.getElementById('noPage').style.display = 'block';
+            // Local version from app-config.json
+            local_version: null,
+
+            // Loaded from sheet
+            latest_version: null,
+
+            // Fixed app URL — always in iframe when online
+            app_url: "https://kothabolbo.vercel.app/",
+
+            // app-config.json path
+            config_path: ".hopweb/app-config.json",
+
+            // Offline sound path
+            offline_sound_path: "sound/offlinesound.mp3",
+
+            debug: true,
+            check_interval: 3000
+        };
+
+        let isOnlineMode = false;
+        let splashDone = false;
+        let connectionCheckInterval = null;
+        let updateModalDismissed = false;
+        let offlineSoundPlayed = false; // Track if sound already played
+
+        // Audio element reference
+        let offlineAudio = null;
+
+        // ========================================
+        // App Initialization
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 App Starting...');
+
+            // Initialize audio element
+            initOfflineSound();
+
+            // Step 1: Load local config first
+            loadLocalConfig()
+                .then(() => {
+                    debugLog('✅ Local config loaded. Version: ' + APP_CONFIG.local_version);
+                    
+                    // Step 2: Load sheet data
+                    return loadDataFromSheet();
+                })
+                .then(() => {
+                    debugLog('✅ Sheet data loaded. Latest version: ' + APP_CONFIG.latest_version);
+                    
+                    // Step 3: Hide splash and check versions
+                    hideSplash(() => {
+                        checkVersionAndProceed();
+                    });
+                })
+                .catch(error => {
+                    debugLog('⚠️ Error: ' + error.message);
+                    // Even if error, try to proceed
+                    hideSplash(() => {
+                        checkVersionAndProceed();
+                    });
+                });
+
+            // Online/Offline events - immediate response
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+
+            // Start continuous connection checking
+            startConnectionMonitoring();
+
+            // Long-press / right-click for debug console
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                toggleDebug();
+                return false;
+            });
+
+            debugLog('✅ App initialized');
+        });
+
+        // ========================================
+        // Initialize Offline Sound
+        // ========================================
+        function initOfflineSound() {
+            offlineAudio = document.getElementById('offlineSound');
             
-            // ৩০০০ মিলিসেকেন্ড = ৩ সেকেন্ড
-            setTimeout(function() {
-                // নিচের কোটেশনের (" ") ভেতর আপনার কাঙ্ক্ষিত 'No' এর লিংকটি বসিয়ে দিন
-                window.location.href = "https://www.facebook.com/tanjil.islam.5960"; 
-            }, 3000);
+            if (offlineAudio) {
+                // Preload the audio
+                offlineAudio.load();
+                
+                // Error handling
+                offlineAudio.addEventListener('error', function(e) {
+                    debugLog('⚠️ Offline sound file not found or error loading: ' + APP_CONFIG.offline_sound_path);
+                    debugLog('   Make sure "sound/offlinesound.mp3" exists in your project');
+                });
+                
+                offlineAudio.addEventListener('loadeddata', function() {
+                    debugLog('🔊 Offline sound loaded successfully');
+                });
+                
+                debugLog('🔊 Offline sound initialized');
+            } else {
+                debugLog('⚠️ Audio element not found');
+            }
         }
-    </script>
 
+        // ========================================
+        // Play Offline Sound
+        // ========================================
+        function playOfflineSound() {
+            if (!offlineAudio) {
+                debugLog('⚠️ Audio element not available');
+                return;
+            }
+
+            // Reset sound if it was played before
+            if (offlineSoundPlayed) {
+                offlineAudio.currentTime = 0;
+            }
+
+            // Play the sound
+            const playPromise = offlineAudio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        offlineSoundPlayed = true;
+                        debugLog('🔊 Offline sound playing...');
+                    })
+                    .catch(error => {
+                        debugLog('⚠️ Error playing offline sound: ' + error.message);
+                        // Auto-play might be blocked, try again on user interaction
+                        document.addEventListener('click', function playOnClick() {
+                            offlineAudio.play().catch(e => {
+                                debugLog('⚠️ Still cannot play sound: ' + e.message);
+                            });
+                            document.removeEventListener('click', playOnClick);
+                        }, { once: true });
+                    });
+            }
+        }
+
+        // ========================================
+        // Stop Offline Sound (when back online)
+        // ========================================
+        function stopOfflineSound() {
+            if (offlineAudio) {
+                offlineAudio.pause();
+                offlineAudio.currentTime = 0;
+                offlineSoundPlayed = false;
+                debugLog('🔊 Offline sound stopped');
+            }
+        }
+
+        // ========================================
+        // Load Local Config from app-config.json
+        // ========================================
+        function loadLocalConfig() {
+            return new Promise((resolve, reject) => {
+                debugLog('📁 Loading local config from: ' + APP_CONFIG.config_path);
+
+                fetch(APP_CONFIG.config_path)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status} - Config file not found`);
+                        }
+                        return response.json();
+                    })
+                    .then(config => {
+                        debugLog('📄 Config JSON loaded successfully');
+                        
+                        // Extract versionName
+                        if (config && config.versionName) {
+                            APP_CONFIG.local_version = config.versionName.toString().trim();
+                            debugLog('📍 Local versionName: ' + APP_CONFIG.local_version);
+                        } else {
+                            debugLog('⚠️ versionName not found in config file');
+                            APP_CONFIG.local_version = null;
+                        }
+                        resolve();
+                    })
+                    .catch(error => {
+                        debugLog('❌ Failed to load local config: ' + error.message);
+                        APP_CONFIG.local_version = null;
+                        resolve(); // Resolve anyway to continue
+                    });
+            });
+        }
+
+        // ========================================
+        // Start Connection Monitoring
+        // ========================================
+        function startConnectionMonitoring() {
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+            }
+            
+            connectionCheckInterval = setInterval(() => {
+                checkConnection();
+            }, APP_CONFIG.check_interval);
+            
+            debugLog('🔄 Connection monitoring started (every 3s)');
+        }
+
+        // ========================================
+        // Hide Splash
+        // ========================================
+        function hideSplash(callback) {
+            const splash = document.getElementById('splashScreen');
+            const minTime = 2000;
+            const startTime = Date.now();
+            
+            function doHide() {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, minTime - elapsed);
+                
+                setTimeout(() => {
+                    splash.classList.add('hide');
+                    splashDone = true;
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                        if (callback) callback();
+                    }, 650);
+                }, remaining);
+            }
+            
+            doHide();
+        }
+
+        // ========================================
+        // Load Data from Google Sheet
+        // ========================================
+        function loadDataFromSheet() {
+            return new Promise((resolve, reject) => {
+                debugLog('📥 Loading CSV from Google Sheet...');
+
+                fetch(APP_CONFIG.csv_url)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        return response.text();
+                    })
+                    .then(csvText => {
+                        debugLog('✅ CSV data received');
+                        parseCSVData(csvText);
+                        resolve();
+                    })
+                    .catch(error => {
+                        debugLog('❌ CSV Load Failed: ' + error.message);
+                        APP_CONFIG.latest_version = null;
+                        resolve(); // Resolve anyway
+                    });
+            });
+        }
+
+        // ========================================
+        // Parse CSV Data - Skip header row
+        // ========================================
+        function parseCSVData(csvText) {
+            const lines = csvText.trim().split('\n');
+
+            if (lines.length < 2) {
+                debugLog('⚠️ No data rows in CSV (only header or empty)');
+                return;
+            }
+
+            debugLog(`📊 Total rows (including header): ${lines.length}`);
+
+            // Skip first row (header) - start from index 1
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue; // Skip empty lines
+
+                const cells = line.split(',').map(cell => cell.trim());
+
+                debugLog(`📝 Row ${i}: ${JSON.stringify(cells)}`);
+
+                if (cells.length < 3) {
+                    debugLog(`⚠️ Row ${i} skipped: insufficient columns`);
+                    continue;
+                }
+
+                const key    = cells[0] || '';
+                const url    = cells[1] || '';
+                const status = (cells[2] || '').toLowerCase();
+
+                debugLog(`🔍 Checking: key="${key}", url="${url}", status="${status}"`);
+
+                if (status === 'active') {
+                    // Check if it's a valid version number
+                    if (/^\d+(\.\d+)*$/.test(key)) {
+                        APP_CONFIG.latest_version = key;
+                        debugLog(`📍 Sheet Version (active): ${key}`);
+                    } else {
+                        debugLog(`⚠️ Invalid version format: ${key}`);
+                    }
+                }
+            }
+
+            if (!APP_CONFIG.latest_version) {
+                debugLog('⚠️ No active version found in sheet');
+            }
+        }
+
+        // ========================================
+        // Check Version and Proceed
+        // ========================================
+        function checkVersionAndProceed() {
+            const localVer = APP_CONFIG.local_version;
+            const sheetVer = APP_CONFIG.latest_version;
+
+            debugLog('🔍 ========== VERSION CHECK ==========');
+            debugLog(`   Local (app-config.json): "${localVer || 'NOT FOUND'}"`);
+            debugLog(`   Sheet (Google Sheet):    "${sheetVer || 'NOT FOUND'}"`);
+
+            // Case 1: Local version exists AND matches sheet version
+            if (localVer && sheetVer && localVer === sheetVer) {
+                debugLog('✅ Version MATCH! No update needed.');
+                debugLog('✅ Loading app normally...');
+                loadWebsite();
+                checkConnection();
+                return;
+            }
+
+            // Case 2: Local version exists but doesn't match sheet version
+            if (localVer && sheetVer && localVer !== sheetVer) {
+                debugLog(`⚠️ Version MISMATCH! Local: "${localVer}" vs Sheet: "${sheetVer}"`);
+                showUpdateModal();
+                return;
+            }
+
+            // Case 3: Sheet not loaded (no internet or sheet error)
+            if (!sheetVer) {
+                debugLog('⚠️ Cannot check version (sheet not loaded).');
+                debugLog('⚠️ Loading app anyway (offline mode)...');
+                loadWebsite();
+                checkConnection();
+                return;
+            }
+
+            // Case 4: No local version found, but sheet has version
+            if (!localVer && sheetVer) {
+                debugLog('⚠️ No local version found. Update required.');
+                showUpdateModal();
+                return;
+            }
+
+            // Fallback: load app
+            debugLog('⚠️ Fallback: Loading app...');
+            loadWebsite();
+            checkConnection();
+        }
+
+        // ========================================
+        // Load Website in iframe
+        // ========================================
+        function loadWebsite() {
+            const webview = document.getElementById('webviewContainer');
+            debugLog(`📱 Loading app in iframe: ${APP_CONFIG.app_url}`);
+            webview.src = APP_CONFIG.app_url;
+            showOnlineContent();
+        }
+
+        // ========================================
+        // Reload iframe (for reconnection)
+        // ========================================
+        function reloadIframe() {
+            const webview = document.getElementById('webviewContainer');
+            debugLog('🔄 Reloading iframe...');
+            webview.src = 'about:blank';
+            setTimeout(() => {
+                webview.src = APP_CONFIG.app_url;
+                debugLog('✅ Iframe reloaded with fresh content');
+            }, 100);
+        }
+
+        // ========================================
+        // Show Update Modal
+        // ========================================
+        function showUpdateModal() {
+            if (updateModalDismissed) {
+                debugLog('⚠️ Update modal already dismissed, loading app...');
+                loadWebsite();
+                checkConnection();
+                return;
+            }
+            
+            debugLog('📢 Showing update modal');
+            const modal = document.getElementById('updateModal');
+            modal.classList.add('active');
+            
+            document.getElementById('webviewContainer').classList.remove('active');
+            document.getElementById('offlineContainer').classList.remove('active');
+        }
+
+        // ========================================
+        // Handle Close Button → Dismiss modal & load app
+        // ========================================
+        function handleClose() {
+            debugLog('❌ User dismissed update modal');
+            updateModalDismissed = true;
+            
+            const modal = document.getElementById('updateModal');
+            modal.classList.remove('active');
+            
+            // Load app normally after dismissing
+            setTimeout(() => {
+                loadWebsite();
+                checkConnection();
+                debugLog('✅ App loaded after modal dismissed');
+            }, 300);
+        }
+
+        // ========================================
+        // Check Connection
+        // ========================================
+        function checkConnection() {
+            if (document.getElementById('updateModal').classList.contains('active')) {
+                return;
+            }
+            
+            const isOnline = navigator.onLine;
+
+            if (!isOnline) {
+                debugLog('📴 Browser reports offline');
+                showOfflineContent();
+                updateStatusIndicator(false);
+                
+                // PLAY OFFLINE SOUND when offline detected
+                if (!isOnlineMode) {
+                    // Only play if wasn't already offline
+                }
+                playOfflineSound();
+                
+                isOnlineMode = false;
+                return;
+            }
+
+            fetch('https://www.google.com/favicon.ico', {
+                method: 'HEAD',
+                cache: 'no-store',
+                mode: 'no-cors'
+            })
+            .then(() => {
+                debugLog('✅ Internet connection verified');
+                
+                // STOP OFFLINE SOUND when back online
+                stopOfflineSound();
+                
+                if (!isOnlineMode) {
+                    debugLog('🔄 Reconnected! Reloading app...');
+                    reloadIframe();
+                } else {
+                    // Only show online if iframe already loaded
+                    const webview = document.getElementById('webviewContainer');
+                    if (webview.src.includes(APP_CONFIG.app_url)) {
+                        showOnlineContent();
+                    } else {
+                        loadWebsite();
+                    }
+                }
+                updateStatusIndicator(true);
+                isOnlineMode = true;
+            })
+            .catch(() => {
+                debugLog('❌ Internet connection failed verification');
+                showOfflineContent();
+                updateStatusIndicator(false);
+                
+                // PLAY OFFLINE SOUND when connection fails
+                playOfflineSound();
+                
+                isOnlineMode = false;
+            });
+        }
+
+        // ========================================
+        // Show Online Content
+        // ========================================
+        function showOnlineContent() {
+            const webview = document.getElementById('webviewContainer');
+            const offline = document.getElementById('offlineContainer');
+
+            if (!webview.classList.contains('active')) {
+                webview.classList.add('active');
+                offline.classList.remove('active');
+                debugLog('📱 Showing online content');
+                
+                // Stop offline sound when showing online content
+                stopOfflineSound();
+            }
+        }
+
+        // ========================================
+        // Show Offline Content
+        // ========================================
+        function showOfflineContent() {
+            const webview = document.getElementById('webviewContainer');
+            const offline = document.getElementById('offlineContainer');
+
+            if (!offline.classList.contains('active')) {
+                webview.classList.remove('active');
+                offline.classList.add('active');
+                debugLog('📴 Showing offline content');
+                
+                // PLAY OFFLINE SOUND immediately when showing offline page
+                playOfflineSound();
+            }
+        }
+
+        // ========================================
+        // Update Status Indicator
+        // ========================================
+        function updateStatusIndicator(online) {
+            const indicator = document.getElementById('statusIndicator');
+            if (online) {
+                indicator.classList.add('online');
+            } else {
+                indicator.classList.remove('online');
+            }
+        }
+
+        // ========================================
+        // Handle Online Event
+        // ========================================
+        function handleOnline() {
+            debugLog('📡 ONLINE event fired!');
+            // Stop offline sound when online event fires
+            stopOfflineSound();
+            setTimeout(() => {
+                checkConnection();
+            }, 500);
+        }
+
+        // ========================================
+        // Handle Offline Event
+        // ========================================
+        function handleOffline() {
+            debugLog('📴 OFFLINE event fired!');
+            if (!document.getElementById('updateModal').classList.contains('active')) {
+                showOfflineContent();
+                updateStatusIndicator(false);
+                isOnlineMode = false;
+                
+                // PLAY OFFLINE SOUND immediately
+                playOfflineSound();
+            }
+        }
+
+        // ========================================
+        // Debug Logging
+        // ========================================
+        function debugLog(message) {
+            console.log('[KothaBolbo]', message);
+
+            if (APP_CONFIG.debug) {
+                const debugContent = document.getElementById('debugContent');
+                if (!debugContent) return;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                const line = document.createElement('div');
+                line.className = 'debug-line';
+                line.textContent = `[${timestamp}] ${message}`;
+                debugContent.insertBefore(line, debugContent.firstChild);
+
+                // Keep only last 100 lines
+                while (debugContent.children.length > 100) {
+                    debugContent.removeChild(debugContent.lastChild);
+                }
+            }
+        }
+
+        function toggleDebug() {
+            const cons = document.getElementById('debugConsole');
+            if (cons) {
+                cons.classList.toggle('show');
+            }
+        }
+
+        debugLog('✅ KothaBolbo - Offline Sound Feature Ready');
+    </script>
 </body>
 </html>
