@@ -1,0 +1,52 @@
+name: Analyze Kernel Module
+
+on:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify kernel module
+        run: |
+          echo "===== FILE ====="
+          file extracted.ko
+          echo "===== SIZE ====="
+          ls -lh extracted.ko
+
+      - name: Module metadata
+        run: |
+          echo "===== MODINFO ====="
+          modinfo ./extracted.ko || true
+
+      - name: ELF header
+        run: |
+          echo "===== ELF HEADER ====="
+          readelf -h extracted.ko
+
+      - name: Function symbols
+        run: |
+          echo "===== FUNCTION SYMBOLS ====="
+          readelf -s extracted.ko | grep FUNC || true
+
+      - name: Extract strings
+        run: |
+          strings extracted.ko > strings.txt
+          echo "===== FIRST 200 STRINGS ====="
+          head -200 strings.txt
+
+      - name: Save symbol table
+        run: |
+          readelf -s extracted.ko > symbols.txt
+
+      - name: Upload analysis files
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-module-analysis
+          path: |
+            strings.txt
+            symbols.txt
