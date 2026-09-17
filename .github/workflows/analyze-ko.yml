@@ -1,4 +1,4 @@
-name: Analyze Kernel Module
+name: Deep Analyze Kernel Module
 
 on:
   workflow_dispatch:
@@ -11,42 +11,56 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify kernel module
+      - name: Install ARM64 analysis tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binutils-aarch64-linux-gnu
+
+      - name: Basic information
         run: |
           echo "===== FILE ====="
           file extracted.ko
-          echo "===== SIZE ====="
-          ls -lh extracted.ko
 
-      - name: Module metadata
-        run: |
           echo "===== MODINFO ====="
           modinfo ./extracted.ko || true
 
-      - name: ELF header
-        run: |
-          echo "===== ELF HEADER ====="
-          readelf -h extracted.ko
+          echo "===== SIZE ====="
+          ls -lh extracted.ko
 
-      - name: Function symbols
+      - name: Full symbols
         run: |
-          echo "===== FUNCTION SYMBOLS ====="
-          readelf -s extracted.ko | grep FUNC || true
+          readelf -Ws extracted.ko > symbols-full.txt
 
-      - name: Extract strings
+      - name: DWARF debug information
         run: |
-          strings extracted.ko > strings.txt
-          echo "===== FIRST 200 STRINGS ====="
-          head -200 strings.txt
+          readelf --debug-dump=info extracted.ko > dwarf-info.txt || true
+          readelf --debug-dump=decodedline extracted.ko > dwarf-lines.txt || true
+          readelf --debug-dump=frames extracted.ko > dwarf-frames.txt || true
 
-      - name: Save symbol table
+      - name: ARM64 disassembly
         run: |
-          readelf -s extracted.ko > symbols.txt
+          aarch64-linux-gnu-objdump -drwC extracted.ko > disassembly.txt
 
-      - name: Upload analysis files
+      - name: Relevant functions
+        run: |
+          grep -nE \
+          "get_rand_str|translate_linear_address|read_physical_address|write_physical_address|read_process_memory|write_process_memory|get_module_base|dispatch_ioctl|dispatch_open|dispatch_close|init_module|cleanup_module" \
+          symbols-full.txt dwarf-info.txt disassembly.txt \
+          > relevant-functions.txt || true
+
+      - name: Module strings
+        run: |
+          strings extracted.ko > strings-full.txt
+
+      - name: Upload analysis
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-module-analysis
+          name: kernel-module-deep-analysis
           path: |
-            strings.txt
-            symbols.txt
+            symbols-full.txt
+            dwarf-info.txt
+            dwarf-lines.txt
+            dwarf-frames.txt
+            disassembly.txt
+            relevant-functions.txt
+            strings-full.txt
