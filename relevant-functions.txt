@@ -1,0 +1,108 @@
+symbols-full.txt:7:     3: 0000000000000008    10 OBJECT  LOCAL  DEFAULT    7 get_rand_str.string
+symbols-full.txt:42:    38: 0000000000000000   428 FUNC    GLOBAL DEFAULT    3 get_rand_str
+symbols-full.txt:44:    40: 00000000000001ac   132 FUNC    GLOBAL DEFAULT    3 translate_linear_address
+symbols-full.txt:46:    42: 0000000000000230   172 FUNC    GLOBAL DEFAULT    3 read_physical_address
+symbols-full.txt:52:    48: 00000000000002dc   196 FUNC    GLOBAL DEFAULT    3 write_physical_address
+symbols-full.txt:55:    51: 00000000000003a0   320 FUNC    GLOBAL DEFAULT    3 read_process_memory
+symbols-full.txt:60:    56: 00000000000004e0   320 FUNC    GLOBAL DEFAULT    3 write_process_memory
+symbols-full.txt:61:    57: 0000000000000620   668 FUNC    GLOBAL DEFAULT    3 dispatch_ioctl
+symbols-full.txt:68:    64: 00000000000008bc    60 FUNC    GLOBAL DEFAULT    3 dispatch_open
+symbols-full.txt:70:    66: 00000000000008f8    40 FUNC    GLOBAL DEFAULT    3 dispatch_close
+symbols-full.txt:71:    67: 0000000000000000   628 FUNC    GLOBAL DEFAULT    8 init_module
+symbols-full.txt:85:    81: 0000000000000000   148 FUNC    GLOBAL DEFAULT   10 cleanup_module
+dwarf-info.txt:26:    <37>   DW_AT_name        : (indexed string: 0x87b): get_rand_str
+dwarf-info.txt:19700:    <8856>   DW_AT_name        : (indexed string: 0x87c): read_physical_address
+dwarf-info.txt:19957:    <8a0e>   DW_AT_name        : (indexed string: 0x87d): write_physical_address
+dwarf-info.txt:20125:    <8b3c>   DW_AT_name        : (indexed string: 0x856): translate_linear_address
+dwarf-info.txt:20178:    <8b95>   DW_AT_name        : (indexed string: 0x87e): read_process_memory
+dwarf-info.txt:20386:    <8cf0>   DW_AT_name        : (indexed string: 0x87f): write_process_memory
+dwarf-info.txt:20550:    <8e07>   DW_AT_name        : (indexed string: 0x85f): get_module_base
+dwarf-info.txt:20626:    <8e86>   DW_AT_name        : (indexed string: 0x880): dispatch_ioctl
+dwarf-info.txt:21122:    <9232>   DW_AT_name        : (indexed string: 0x881): dispatch_open
+dwarf-info.txt:21160:    <926d>   DW_AT_name        : (indexed string: 0x882): dispatch_close
+disassembly.txt:17:0000000000000000 <get_rand_str>:
+disassembly.txt:126:00000000000001ac <translate_linear_address>:
+disassembly.txt:130: 1b8:	36080388 	tbz	w8, #1, 228 <translate_linear_address+0x7c>
+disassembly.txt:143: 1ec:	b40001e8 	cbz	x8, 228 <translate_linear_address+0x7c>
+disassembly.txt:154: 218:	54000080 	b.eq	228 <translate_linear_address+0x7c>  // b.none
+disassembly.txt:161:0000000000000230 <read_physical_address>:
+disassembly.txt:171: 254:	340003a0 	cbz	w0, 2c8 <read_physical_address+0x98>
+disassembly.txt:175: 264:	b4000340 	cbz	x0, 2cc <read_physical_address+0x9c>
+disassembly.txt:189: 29c:	b40000c9 	cbz	x9, 2b4 <read_physical_address+0x84>
+disassembly.txt:199: 2c4:	14000002 	b	2cc <read_physical_address+0x9c>
+disassembly.txt:206:00000000000002dc <write_physical_address>:
+disassembly.txt:216: 300:	34000380 	cbz	w0, 370 <write_physical_address+0x94>
+disassembly.txt:220: 310:	b4000300 	cbz	x0, 370 <write_physical_address+0x94>
+disassembly.txt:234: 348:	b40000c9 	cbz	x9, 360 <write_physical_address+0x84>
+disassembly.txt:240: 360:	b5000142 	cbnz	x2, 388 <write_physical_address+0xac>
+disassembly.txt:243: 36c:	14000002 	b	374 <write_physical_address+0x98>
+disassembly.txt:255: 39c:	17fffff2 	b	364 <write_physical_address+0x88>
+disassembly.txt:257:00000000000003a0 <read_process_memory>:
+disassembly.txt:271: 3d4:	b4000780 	cbz	x0, 4c4 <read_process_memory+0x124>
+disassembly.txt:273: 3dc:	b4000740 	cbz	x0, 4c4 <read_process_memory+0x124>
+disassembly.txt:276: 3e8:	b4000673 	cbz	x19, 4b4 <read_process_memory+0x114>
+disassembly.txt:284: 408:	14000009 	b	42c <read_process_memory+0x8c>
+disassembly.txt:292: 428:	54000460 	b.eq	4b4 <read_process_memory+0x114>  // b.none
+disassembly.txt:296: 438:	360ffea9 	tbz	w9, #1, 40c <read_process_memory+0x6c>
+disassembly.txt:305: 45c:	b4fffd89 	cbz	x9, 40c <read_process_memory+0x6c>
+disassembly.txt:314: 480:	54fffc60 	b.eq	40c <read_process_memory+0x6c>  // b.none
+disassembly.txt:321: 49c:	b4fffc00 	cbz	x0, 41c <read_process_memory+0x7c>
+disassembly.txt:324: 4a8:	94000000 	bl	230 <read_physical_address>	4a8: R_AARCH64_CALL26	read_physical_address
+disassembly.txt:326: 4b0:	17ffffdb 	b	41c <read_process_memory+0x7c>
+disassembly.txt:339:00000000000004e0 <write_process_memory>:
+disassembly.txt:353: 514:	b4000780 	cbz	x0, 604 <write_process_memory+0x124>
+disassembly.txt:355: 51c:	b4000740 	cbz	x0, 604 <write_process_memory+0x124>
+disassembly.txt:358: 528:	b4000673 	cbz	x19, 5f4 <write_process_memory+0x114>
+disassembly.txt:366: 548:	14000009 	b	56c <write_process_memory+0x8c>
+disassembly.txt:374: 568:	54000460 	b.eq	5f4 <write_process_memory+0x114>  // b.none
+disassembly.txt:378: 578:	360ffea9 	tbz	w9, #1, 54c <write_process_memory+0x6c>
+disassembly.txt:387: 59c:	b4fffd89 	cbz	x9, 54c <write_process_memory+0x6c>
+disassembly.txt:396: 5c0:	54fffc60 	b.eq	54c <write_process_memory+0x6c>  // b.none
+disassembly.txt:403: 5dc:	b4fffc00 	cbz	x0, 55c <write_process_memory+0x7c>
+disassembly.txt:406: 5e8:	94000000 	bl	2dc <write_physical_address>	5e8: R_AARCH64_CALL26	write_physical_address
+disassembly.txt:408: 5f0:	17ffffdb 	b	55c <write_process_memory+0x7c>
+disassembly.txt:421:0000000000000620 <dispatch_ioctl>:
+disassembly.txt:446: 680:	54000320 	b.eq	6e4 <dispatch_ioctl+0xc4>  // b.none
+disassembly.txt:448: 688:	54000b00 	b.eq	7e8 <dispatch_ioctl+0x1c8>  // b.none
+disassembly.txt:450: 690:	54000d61 	b.ne	83c <dispatch_ioctl+0x21c>  // b.any
+disassembly.txt:459: 6b4:	b4000f29 	cbz	x9, 898 <dispatch_ioctl+0x278>
+disassembly.txt:464: 6c8:	b5000e80 	cbnz	x0, 898 <dispatch_ioctl+0x278>
+disassembly.txt:468: 6d8:	94000000 	bl	3a0 <read_process_memory>	6d8: R_AARCH64_CALL26	read_process_memory
+disassembly.txt:469: 6dc:	37000e20 	tbnz	w0, #0, 8a0 <dispatch_ioctl+0x280>
+disassembly.txt:470: 6e0:	14000055 	b	834 <dispatch_ioctl+0x214>
+disassembly.txt:479: 704:	b4000ca9 	cbz	x9, 898 <dispatch_ioctl+0x278>
+disassembly.txt:484: 718:	b5000c00 	cbnz	x0, 898 <dispatch_ioctl+0x278>
+disassembly.txt:493: 73c:	b4000ae9 	cbz	x9, 898 <dispatch_ioctl+0x278>
+disassembly.txt:497: 74c:	b5000a60 	cbnz	x0, 898 <dispatch_ioctl+0x278>
+disassembly.txt:506: 770:	b40006b4 	cbz	x20, 844 <dispatch_ioctl+0x224>
+disassembly.txt:509: 77c:	b4000640 	cbz	x0, 844 <dispatch_ioctl+0x224>
+disassembly.txt:514: 790:	b4000640 	cbz	x0, 858 <dispatch_ioctl+0x238>
+disassembly.txt:516: 798:	b40001e8 	cbz	x8, 7d4 <dispatch_ioctl+0x1b4>
+disassembly.txt:522: 7b0:	54000128 	b.hi	7d4 <dispatch_ioctl+0x1b4>  // b.pmore
+disassembly.txt:530: 7d0:	34000420 	cbz	w0, 854 <dispatch_ioctl+0x234>
+disassembly.txt:533: 7dc:	54000380 	b.eq	84c <dispatch_ioctl+0x22c>  // b.none
+disassembly.txt:535: 7e4:	17ffffe9 	b	788 <dispatch_ioctl+0x168>
+disassembly.txt:544: 808:	b4000489 	cbz	x9, 898 <dispatch_ioctl+0x278>
+disassembly.txt:549: 81c:	b50003e0 	cbnz	x0, 898 <dispatch_ioctl+0x278>
+disassembly.txt:553: 82c:	94000000 	bl	4e0 <write_process_memory>	82c: R_AARCH64_CALL26	write_process_memory
+disassembly.txt:554: 830:	37000380 	tbnz	w0, #0, 8a0 <dispatch_ioctl+0x280>
+disassembly.txt:556: 838:	1400001b 	b	8a4 <dispatch_ioctl+0x284>
+disassembly.txt:558: 840:	14000019 	b	8a4 <dispatch_ioctl+0x284>
+disassembly.txt:560: 848:	14000006 	b	860 <dispatch_ioctl+0x240>
+disassembly.txt:562: 850:	14000002 	b	858 <dispatch_ioctl+0x238>
+disassembly.txt:574: 880:	b40000c9 	cbz	x9, 898 <dispatch_ioctl+0x278>
+disassembly.txt:579: 894:	b4000060 	cbz	x0, 8a0 <dispatch_ioctl+0x280>
+disassembly.txt:581: 89c:	14000002 	b	8a4 <dispatch_ioctl+0x284>
+disassembly.txt:590:00000000000008bc <dispatch_open>:
+disassembly.txt:607:00000000000008f8 <dispatch_close>:
+disassembly.txt:621:0000000000000000 <init_module>:
+disassembly.txt:636:  38:	94000000 	bl	0 <init_module>	38: R_AARCH64_CALL26	get_rand_str
+disassembly.txt:650:  70:	37f80400 	tbnz	w0, #31, f0 <init_module+0xf0>
+disassembly.txt:670:  c0:	34000280 	cbz	w0, 110 <init_module+0x110>
+disassembly.txt:681:  ec:	1400005c 	b	25c <init_module+0x25c>
+disassembly.txt:689: 10c:	14000054 	b	25c <init_module+0x25c>
+disassembly.txt:703: 144:	540001a3 	b.cc	178 <init_module+0x178>  // b.lo, b.ul, b.last
+disassembly.txt:715: 174:	1400003a 	b	25c <init_module+0x25c>
+disassembly.txt:727: 1a4:	540004e3 	b.cc	240 <init_module+0x240>  // b.lo, b.ul, b.last
+disassembly.txt:765: 23c:	14000008 	b	25c <init_module+0x25c>
+disassembly.txt:782:0000000000000000 <cleanup_module>:
