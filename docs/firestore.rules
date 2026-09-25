@@ -1,0 +1,81 @@
+// PROPOSED / UNVERIFIED Firestore rules for the native Kotha Bolbo client.
+// The live project's current rules were not supplied. Review in Firebase Rules Playground,
+// test against the Emulator Suite, then deploy separately — this file is NOT auto-deployed.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+    function isParticipant(data) {
+      return signedIn() && (data.senderId == request.auth.uid || data.receiverId == request.auth.uid);
+    }
+    function immutableMessageParties() {
+      return request.resource.data.senderId == resource.data.senderId
+        && request.resource.data.receiverId == resource.data.receiverId;
+    }
+
+    match /users/{uid} {
+      // Authenticated directory reads are required by people search/chat profile hydration.
+      allow get, list: if signedIn();
+      allow create: if isMe(uid) && request.resource.data.uid == uid;
+      allow update: if isMe(uid) && request.resource.data.uid == resource.data.uid;
+      allow delete: if isMe(uid);
+    }
+
+    match /messages/{messageId} {
+      allow get, list: if isParticipant(resource.data);
+      allow create: if signedIn()
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.receiverId is string
+        && request.resource.data.receiverId != request.auth.uid
+        && request.resource.data.type in ['text', 'image', 'voice'];
+      // Both participants must update delivery/read/seen and their own deletion state.
+      // The client also permits a participant to physically delete for 24h cleanup/clear.
+      allow update: if isParticipant(resource.data) && immutableMessageParties();
+      allow delete: if isParticipant(resource.data);
+    }
+
+    match /chatContacts/{ownerUid} {
+      allow get, create, update, delete: if isMe(ownerUid);
+      match /contacts/{contactUid} {
+        allow get, list: if isMe(ownerUid);
+        // Sending a message writes both contact books. A user may only write their own
+        // reverse card in somebody else's book; the owner can manage every local row.
+        allow create, update: if isMe(ownerUid)
+          || (signedIn() && contactUid == request.auth.uid && request.resource.data.uid == request.auth.uid);
+        // Reverse-reference cleanup during account deletion.
+        allow delete: if isMe(ownerUid) || (signedIn() && contactUid == request.auth.uid);
+      }
+    }
+
+    match /posts/{postId} {
+      // PARITY, NOT SERVER PRIVACY: all authenticated docs remain readable and the app
+      // applies `privacy == public || authorId == me` locally, matching the current product.
+      // A future private-feed redesign requires query/data-model changes before tightening.
+      allow get, list: if signedIn();
+      allow create: if signedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if signedIn() && resource.data.authorId == request.auth.uid
+        || (signedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'likeCount']));
+      allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+    }
+
+    match /stories/{storyId} {
+      // Same documented client-side privacy parity as posts.
+      allow get, list: if signedIn();
+      allow create: if signedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if signedIn() && resource.data.authorId == request.auth.uid;
+      // Shared 60-second cleaner: any authenticated client may delete only after expiry.
+      allow delete: if signedIn() && (
+        resource.data.authorId == request.auth.uid ||
+        (resource.data.expiresAt is timestamp && resource.data.expiresAt <= request.time)
+      );
+    }
+
+    match /app_config/{document} {
+      allow read: if true;
+      allow write: if false; // Admin/server only.
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

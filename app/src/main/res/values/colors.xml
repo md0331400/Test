@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand palette (report §20): deep navy / cyan / purple -->
+    <color name="kb_deep_navy">#0A0E1A</color>
+    <color name="kb_cyan">#00D4FF</color>
+    <color name="kb_purple">#7C3AED</color>
+    <color name="kb_danger">#FF4D6D</color>
+    <color name="kb_success">#4ADE80</color>
+    <color name="kb_warning">#FFB020</color>
+    <color name="kb_drive_blue">#4285F4</color>
+    <color name="ic_launcher_background">#0A0E1A</color>
+</resources>

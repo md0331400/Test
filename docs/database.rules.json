@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "status": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['online', 'lastSeen']) && newData.child('online').isBoolean() && newData.child('lastSeen').isNumber()"
+      }
+    },
+    "typing": {
+      "$pair": {
+        ".read": "auth != null && ($pair.beginsWith(auth.uid + '_') || $pair.endsWith('_' + auth.uid))",
+        ".write": "auth != null && $pair.beginsWith(auth.uid + '_')",
+        ".validate": "newData.hasChildren(['typing', 'timestamp', 'updatedAtLocal']) && newData.child('typing').isBoolean() && newData.child('timestamp').isNumber() && newData.child('updatedAtLocal').isNumber()"
+      }
+    }
+  }
+}

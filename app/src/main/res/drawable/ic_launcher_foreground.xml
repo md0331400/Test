@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Official Kotha Bolbo artwork (do NOT redesign — report §25), inset into the
+     adaptive-icon safe zone so launcher masking never crops the brand mark. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/kb_app_icon"
+    android:inset="18%" />

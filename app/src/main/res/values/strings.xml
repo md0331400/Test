@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kotha Bolbo</string>
+    <string name="notification_channel_name">Chat messages</string>
+    <string name="notification_channel_description">Messages and replies from Kotha Bolbo conversations</string>
+    <string name="notification_reply">Reply</string>
+    <string name="notification_like">Like</string>
+    <string name="notification_reply_hint">Type a reply…</string>
+    <string name="developer_name">Md. Abu Sayem</string>
+    <string name="support_email">support.amisayem@gmail.com</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base activity theme. Dark-first brand: the pre-Compose window is always deep navy.
+         Light/dark appearance is handled inside Compose (ui/theme/Theme.kt). -->
+    <style name="Theme.KothaBolbo.App" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/kb_deep_navy</item>
+        <item name="android:statusBarColor">@color/kb_deep_navy</item>
+        <item name="android:navigationBarColor">@color/kb_deep_navy</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <!-- Android 12+ SplashScreen API theme (report §2.1). -->
+    <style name="Theme.KothaBolbo.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/kb_deep_navy</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/kb_app_icon</item>
+        <item name="postSplashScreenTheme">@style/Theme.KothaBolbo.App</item>
+    </style>
+</resources>
