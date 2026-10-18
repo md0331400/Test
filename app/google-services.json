@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "343828860232",
+    "firebase_url": "https://kotha-bolbo-aso-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "kotha-bolbo-aso",
+    "storage_bucket": "kotha-bolbo-aso.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343828860232:android:81f49f0f98cf891032b77d",
+        "android_client_info": {
+          "package_name": "com.amisayem.kothabolbo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343828860232-5u078onuaghmfthdh5oao62lllfr96l3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amisayem.kothabolbo",
+            "certificate_hash": "9891e959885b850f349de873bc5e065e813990c4"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9z4IV2jr9c53MlD5NUp5t8BPhHJ0_QjY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343828860232-n7korusids9jcse961go8tqne8abob59.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

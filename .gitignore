@@ -1,0 +1,55 @@
+# ─── Android / Gradle build artifacts ───
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+build/
+.app/
+out/
+captures/
+
+# Keystores & signing secrets — NEVER commit these
+*.jks
+*.keystore
+release.properties
+keystore.properties
+*.jks.backup
+signing.properties
+
+# Gradle
+.gradle/
+local.properties
+gradle-app.setting
+!gradle-wrapper.jar
+*.hprof
+
+# IDE / import files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# Local configuration (device-specific, must not be shared)
+.idea/caches/
+.idea/libraries/
+
+# iOS / macOS
+.DS_Store
+
+# Logs & temp
+*.log
+*.tmp
+*.bak
+/tmp/
+
+# Kotlin / Coroutines
+.kotlin/
+
+# Native misc
+/lib/
+*.so
