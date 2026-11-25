@@ -52,6 +52,10 @@ class AndroidBridge(private val activity: MainActivity, private val permissionRe
     @JavascriptInterface fun isDarkMode() = (activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
     @JavascriptInterface fun permissionStatus(permission: String) = if (ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED) "granted" else "denied"
     @JavascriptInterface fun requestPermission(permission: String) = run { permissionRequest.launch(arrayOf(permission)) }
+    @JavascriptInterface fun setNativeNavVisible(visible: Boolean) = activity.setNativeNavVisible(visible)
+    @JavascriptInterface fun setNativeNavTab(tab: String) = activity.setNativeNavTab(tab)
+    @JavascriptInterface fun saveMediaToAppFolder(base64: String, mediaKind: String, fileName: String): String = activity.saveMediaToAppFolder(base64, mediaKind, fileName)
+    @JavascriptInterface fun mirrorMediaToAppFolder(url: String, mediaKind: String, fileName: String) = activity.mirrorMediaToAppFolder(url, mediaKind, fileName)
     @JavascriptInterface fun camera() = run { permissionRequest.launch(arrayOf(Manifest.permission.CAMERA)) }
     @JavascriptInterface fun gallery() = run { activity.pickImage() }
     @JavascriptInterface fun filePicker() = run { activity.pickFile() }

@@ -1,0 +1,25 @@
+# Signing material and local secrets — never commit these.
+*.jks
+*.keystore
+release.properties
+local.properties
+.env
+.env.*
+!.env.example
+
+# Build output (regenerated locally; copies of app secrets end up in here too)
+.gradle/
+build/
+app/build/
+*/build/
+
+# Node / web build
+node_modules/
+web/dist/
+web/.env.local
+web/.env.*.local
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store

@@ -5,15 +5,19 @@ import android.app.DownloadManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.TextView
 import android.webkit.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +35,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import org.json.JSONObject
+import java.io.File
+import java.net.URL
+import java.util.Base64
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -63,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater); setContentView(binding.root)
         // The local HTML applies these system-bar insets through the Android bridge.
         // Do not pad WebView here: CSS fixed screens otherwise receive the inset twice.
-        setupWebView(); loadApp(); fetchNativeFcmToken(); deliverNotificationAction(intent)
+        setupWebView(); setupNativeNav(); loadApp(); fetchNativeFcmToken(); deliverNotificationAction(intent)
         (getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager).registerDefaultNetworkCallback(networkCallback)
     }
     fun startGoogleSignIn() { startActivityForResult(googleClient.signInIntent, 702) }
@@ -176,8 +183,95 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onPermissionRequestCanceled(request: PermissionRequest) { if (pendingMediaPermission == request) pendingMediaPermission = null }
         }
-        webViewClient=object:WebViewClient() { override fun shouldOverrideUrlLoading(v:WebView,r:WebResourceRequest):Boolean { if(!r.isForMainFrame) return false; val u=r.url; return if(u.host=="kotha-bolbo-aso.firebaseapp.com" || u.host=="kothabolbo.vercel.app") false else { startActivity(Intent(Intent.ACTION_VIEW,u)); true } } }
+        // The whole UI comes from the APK. AndroidBridge is attached to this WebView,
+        // so a remote page must never be allowed to navigate in it — hand every
+        // main-frame navigation to the system browser instead.
+        webViewClient=object:WebViewClient() {
+            override fun shouldOverrideUrlLoading(v:WebView,r:WebResourceRequest):Boolean {
+                if(!r.isForMainFrame) return false
+                try { startActivity(Intent(Intent.ACTION_VIEW, r.url)) } catch (_: Exception) {}
+                return true
+            }
+        }
     }
+
+    // ── Native glass tab bar ────────────────────────────────────────────────
+    private fun setupNativeNav() {
+        val tabs = arrayOf(
+            Triple("chat", R.id.navChatTab, R.id.navChatIcon to R.id.navChatLabel),
+            Triple("profile", R.id.navProfileTab, R.id.navProfileIcon to R.id.navProfileLabel),
+            Triple("settings", R.id.navSettingsTab, R.id.navSettingsIcon to R.id.navSettingsLabel)
+        )
+        tabs.forEach { (tab, containerId, views) ->
+            findViewById<View>(containerId)?.setOnClickListener {
+                js("window.switchTab&&window.switchTab('$tab')")
+                setNativeNavTab(tab)
+            }
+        }
+        setNativeNavTab("chat")
+    }
+
+    fun setNativeNavVisible(visible: Boolean) = runOnUiThread {
+        findViewById<View>(R.id.nativeNav)?.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    fun setNativeNavTab(tab: String) = runOnUiThread {
+        val active = Color.parseColor("#00D4FF")
+        val idle = Color.parseColor("#8899BB")
+        listOf(
+            Triple("chat", R.id.navChatIcon, R.id.navChatLabel),
+            Triple("profile", R.id.navProfileIcon, R.id.navProfileLabel),
+            Triple("settings", R.id.navSettingsIcon, R.id.navSettingsLabel)
+        ).forEach { (name, iconId, labelId) ->
+            val color = if (name == tab) active else idle
+            findViewById<ImageView>(iconId)?.setColorFilter(color)
+            findViewById<TextView>(labelId)?.setTextColor(color)
+        }
+    }
+
+    /** WhatsApp-style app-specific media folders; no broad storage permission needed. */
+    fun saveMediaToAppFolder(base64: String, mediaKind: String, fileName: String): String {
+        val folder = when (mediaKind) {
+            "photos" -> "Kotha Bolbo Photos"
+            "videos" -> "Kotha Bolbo video"
+            "audio" -> "Kotha Bolbo Audio"
+            "backup" -> "Kotha Bolbo Chat backup"
+            else -> return ""
+        }
+        val safeName = fileName.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "file" }
+        val root = getExternalMediaDirs().firstOrNull { it != null && it.canWrite() }
+            ?: filesDir
+        val dir = File(root, "Kotha Bolbo/media/$folder").apply { mkdirs() }
+        // Chat backups must not be indexed by the gallery app.
+        if (mediaKind == "backup") File(dir, ".nomedia").createNewFile()
+        val target = File(dir, safeName)
+        target.writeBytes(Base64.decode(base64, Base64.DEFAULT))
+        if (mediaKind != "backup") {
+            val mime = when (mediaKind) {
+                "photos" -> "image/*"
+                "videos" -> "video/*"
+                else -> "audio/*"
+            }
+            MediaScannerConnection.scanFile(this, arrayOf(target.absolutePath), arrayOf(mime), null)
+        }
+        return target.absolutePath
+    }
+
+    /** Download an already-uploaded chat attachment into the app-specific media folder. */
+    fun mirrorMediaToAppFolder(url: String, mediaKind: String, fileName: String) {
+        Thread {
+            try {
+                val target = URL(url)
+                require(target.protocol.equals("https", ignoreCase = true)) { "Only HTTPS media is allowed" }
+                val bytes = target.openStream().use { it.readBytes() }
+                val path = saveMediaToAppFolder(Base64.getEncoder().encodeToString(bytes), mediaKind, fileName)
+                js("window.onNativeMediaMirrored&&window.onNativeMediaMirrored(${JSONObject.quote(path)},${JSONObject.quote(mediaKind)},${JSONObject.quote(fileName)})")
+            } catch (e: Exception) {
+                android.util.Log.w("KothaBolbo", "Could not mirror media to device", e)
+            }
+        }.start()
+    }
+
     private fun loadApp() { val source=assets.open("index.html").bufferedReader().use { it.readText() }; binding.webView.loadDataWithBaseURL("https://kothabolbo.vercel.app/",source,"text/html","UTF-8",null) }
     override fun onActivityResult(r:Int,c:Int,d:Intent?) {
         super.onActivityResult(r,c,d)

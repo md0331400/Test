@@ -1573,6 +1573,32 @@
           properties on interactive elements. */
     .settings-row, .nav-btn, .chat-list-item { transition:opacity .15s, transform .15s; }
   </style>
+
+<style>
+/* Native glass tab bar occupies the bottom 92dp on list screens. */
+.kb-native-nav-space .screen:not(#conv-screen) > .scroll-area,
+.kb-native-nav-space .screen > .scroll-area { padding-bottom: 92px !important; }
+.kb-native-nav-space #profile-screen .profile-page-body { padding-bottom: 92px !important; }
+
+/* Settings → Edit Profile bottom sheet */
+.kb-sheet { position:fixed; inset:0; z-index:1000010; display:none; align-items:flex-end; background:rgba(2,6,16,.68); backdrop-filter:blur(8px); }
+.kb-sheet.open { display:flex; }
+.kb-sheet-card { width:100%; max-width:520px; margin:0 auto; background:linear-gradient(160deg,#182238,#0d1424); border:1px solid rgba(0,212,255,.22); border-bottom:0; border-radius:24px 24px 0 0; padding:8px 20px calc(20px + env(safe-area-inset-bottom)); max-height:88vh; overflow-y:auto; animation:kbSheetUp .28s cubic-bezier(.2,.8,.2,1); }
+@keyframes kbSheetUp { from { transform:translateY(100%); } to { transform:none; } }
+.kb-sheet-handle { width:44px; height:4px; border-radius:99px; background:#4a5a78; margin:6px auto 14px; }
+.kb-sheet-title { font-size:1.05rem; font-weight:700; margin-bottom:4px; }
+.kb-sheet-sub { font-size:.72rem; color:var(--text-secondary); margin-bottom:16px; line-height:1.5; }
+.kb-sheet-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+.kb-sheet-action { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid var(--border); border-radius:14px; background:var(--bg-input); color:var(--text-primary); font-family:inherit; font-size:.8rem; font-weight:600; cursor:pointer; text-align:left; }
+.kb-sheet-action i { color:var(--accent); width:18px; text-align:center; }
+.kb-sheet-field { margin-bottom:12px; }
+.kb-sheet-field label { display:block; font-size:.68rem; text-transform:uppercase; letter-spacing:.5px; color:var(--text-secondary); margin-bottom:5px; font-weight:600; }
+.kb-sheet-field input, .kb-sheet-field textarea, .kb-sheet-trigger { width:100%; background:var(--bg-input); border:1.5px solid var(--border); border-radius:11px; color:var(--text-primary); padding:11px 12px; font-family:inherit; font-size:.85rem; outline:none; }
+.kb-sheet-field textarea { resize:none; }
+.kb-sheet-field input:focus, .kb-sheet-field textarea:focus { border-color:var(--accent); }
+.kb-sheet-trigger { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.kb-sheet-note { font-size:.66rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px; }
+</style>
 </head>
 
 
@@ -1590,7 +1616,7 @@
   </div>
   <div class="conv-messages" id="conv-messages">
     <div class="auto-delete-notice" id="auto-delete-notice">
-      <i class="fas fa-clock"></i> Messages are automatically deleted after 24 hours to protect your privacy.
+      <i class="fas fa-shield-alt"></i> Messages leave our server once delivered and stay saved on this device.
     </div>
   </div>
   <button id="new-messages-btn" onclick="scrollConversationToBottom()" style="display:none;position:absolute;right:16px;bottom:70px;z-index:20;border:0;border-radius:999px;padding:10px 14px;background:linear-gradient(135deg,#00d4ff,#7c3aed);color:#06111d;font-weight:800;font-size:.72rem;box-shadow:0 5px 18px rgba(0,212,255,.35);"><i class="fas fa-arrow-down"></i> New messages</button>
@@ -1604,7 +1630,6 @@
     <!-- Left side: image + voice permanently side by side -->
     <div style="display:flex;gap:5px;flex-shrink:0;" id="input-left-btns">
       <button class="voice-btn" id="img-attach-btn" onclick="triggerImagePicker()" title="Send Image" style="background:var(--bg-tertiary);color:var(--text-secondary);border:1.5px solid var(--border);width:34px;height:34px;font-size:14px;"><i class="fas fa-image"></i></button>
-      <button class="voice-btn" id="voice-btn" onclick="startVoiceRecording()" title="Voice Message" style="width:34px;height:34px;font-size:14px;"><i class="fas fa-microphone" id="voice-btn-icon"></i></button>
     </div>
     <input type="file" id="img-file-input" accept="image/*" style="display:none;" onchange="handleImageSelected(event)" />
     <!-- Voice recording bar: timer + waveform + Discard + Send -->
@@ -1626,6 +1651,7 @@
     </div>
     <div class="msg-input-wrap" id="msg-input-wrap-main"><textarea id="msg-input" rows="1" placeholder="Type a message…" oninput="autoResize(this);msgInputChanged();" onkeydown="msgKeyDown(event)"></textarea></div>
     <span class="recording-timer" id="rec-timer" style="display:none;">0:00</span>
+    <button class="voice-btn" id="voice-btn" onclick="startVoiceRecording()" title="Voice Message" style="display:flex;width:38px;height:38px;font-size:15px;"><i class="fas fa-microphone" id="voice-btn-icon"></i></button>
     <button class="send-btn" id="send-btn" onclick="sendMessage()" style="display:none;"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
@@ -1712,23 +1738,6 @@
     <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="chat-search" placeholder="Search chats or find people…" oninput="filterChats(this.value)" onclick="if(!this.value.trim()){openFriendSearch();}" /></div></div>
     <div class="scroll-area" id="chat-list-container"><div class="empty-state" id="chat-empty"><i class="fas fa-comments"></i><h3>No Chats Yet</h3><p>Tap the search bar to find people to chat with!</p></div></div>
   </div>
-  <div class="screen" id="feed-screen">
-    <div class="app-header"><div class="header-info"><h2>Feed</h2><span>Stay updated</span></div></div>
-    <div class="scroll-area" style="flex:1;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:24px;">
-      <div style="text-align:center;max-width:320px;width:100%;">
-        <div style="width:80px;height:80px;background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(124,58,237,0.15));border:1px solid rgba(0,212,255,0.25);border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><i class="fas fa-rss" style="font-size:32px;background:linear-gradient(135deg,#00d4ff,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i></div>
-        <div style="background:var(--bg-card);border:1px solid rgba(0,212,255,0.18);border-radius:18px;padding:24px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
-          <div style="font-size:1.5rem;margin-bottom:10px;">📢</div>
-          <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:8px;">Coming Soon</h3>
-          <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.6;">This feature is coming soon.<br>Please wait for updates.</p>
-          <div style="margin-top:16px;padding:10px 14px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:10px;">
-            <div style="font-size:0.7rem;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;font-weight:600;">Status</div>
-            <div style="font-size:0.8rem;color:var(--accent);margin-top:3px;font-weight:600;display:flex;align-items:center;gap:6px;justify-content:center;"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:typing 1.4s ease infinite;"></span>In Development</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="friend-search-overlay" id="friends-search-overlay">
     <div class="app-header"><button class="header-back" onclick="closeFriendSearch()"><i class="fas fa-times"></i></button><div class="header-info"><h2>Find People</h2><span id="friends-count-text">Search friends to chat</span></div></div>
     <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="friends-search" placeholder="Search by name or phone…" autofocus oninput="filterFriends(this.value)" /></div></div>
@@ -1738,7 +1747,7 @@
     <div class="app-header"><div class="header-info"><h2>Settings</h2><span>Manage your profile</span></div></div>
     <div class="scroll-area" style="flex:1;overflow-y:auto;padding-bottom:16px;">
       <div class="settings-section"><h3>Account</h3><div class="settings-card">
-        <div class="settings-row" onclick="switchTab('profile')"><div class="settings-row-icon" style="background:#00d4ff22;color:var(--accent);"><i class="fas fa-user"></i></div><div class="settings-row-info"><strong>My Profile</strong><small>View and update your profile</small></div><i class="fas fa-chevron-right chevron"></i></div>
+        <div class="settings-row" onclick="openEditProfileSheet()"><div class="settings-row-icon" style="background:#00d4ff22;color:var(--accent);"><i class="fas fa-user-pen"></i></div><div class="settings-row-info"><strong>Edit Profile</strong><small>Photo, cover, name, number, gender, birthday, bio</small></div><i class="fas fa-chevron-right chevron"></i></div>
         <div class="settings-row" id="password-settings-row" onclick="openPasswordSettings()"><div class="settings-row-icon" style="background:#7c3aed22;color:#a78bfa;"><i class="fas fa-lock"></i></div><div class="settings-row-info"><strong id="password-settings-title">Change Password</strong><small id="password-settings-subtitle">Update your password</small></div><i class="fas fa-chevron-right chevron"></i></div>
         <div class="settings-row" onclick="openPrivacyPopup()"><div class="settings-row-icon" style="background:#4ade8022;color:#4ade80;"><i class="fas fa-shield-alt"></i></div><div class="settings-row-info"><strong>Privacy</strong><small>Control who sees your info</small></div><i class="fas fa-chevron-right chevron"></i></div>
         <div class="settings-row" onclick="openInactiveAccountPopup()"><div class="settings-row-icon" style="background:rgba(255,152,0,0.15);color:#ff9800;"><i class="fas fa-user-clock"></i></div><div class="settings-row-info"><strong style="color:#ff9800;">Inactive Account</strong><small style="color:#ff9800;opacity:0.8;">Auto-delete if inactive for a period</small></div><i class="fas fa-chevron-right chevron" style="color:#ff9800;opacity:0.5;"></i></div>
@@ -1814,12 +1823,25 @@
 
     </div>
   </div>
-  <nav class="bottom-nav">
-    <button class="nav-btn" id="nav-feed" onclick="switchTab('feed')"><i class="fas fa-rss"></i><span>Feed</span></button>
-    <button class="nav-btn active" id="nav-chat" onclick="switchTab('chat')"><i class="fas fa-comment-dots"></i><span>Chats</span><span class="badge" id="chat-badge" style="display:none;">0</span></button>
-    <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></button>
-    <button class="nav-btn" id="nav-settings" onclick="switchTab('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
-  </nav>
+</div>
+
+<div class="kb-sheet" id="edit-profile-sheet" onclick="if(event.target===this)closeEditProfileSheet()">
+  <div class="kb-sheet-card">
+    <div class="kb-sheet-handle"></div>
+    <div class="kb-sheet-title"><i class="fas fa-user-pen" style="color:var(--accent);margin-right:8px;"></i>Edit Profile</div>
+    <div class="kb-sheet-sub">Update your photo, cover and details. Everything is saved to your Kotha Bolbo profile.</div>
+    <div class="kb-sheet-grid">
+      <button type="button" class="kb-sheet-action" onclick="closeEditProfileSheet();openAvatarUrlModal('profile')"><i class="fas fa-image"></i> Edit profile photo</button>
+      <button type="button" class="kb-sheet-action" onclick="closeEditProfileSheet();openAvatarUrlModal('cover')"><i class="fas fa-images"></i> Edit cover photo</button>
+    </div>
+    <div class="kb-sheet-field"><label>Full name</label><input type="text" id="kb-sheet-name" maxlength="60" /></div>
+    <div class="kb-sheet-field"><label>Phone number</label><input type="tel" id="kb-sheet-phone" /></div>
+    <div class="kb-sheet-field"><label>Gender</label><select id="kb-sheet-gender" class="kb-sheet-trigger"><option value="">Select gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+    <div class="kb-sheet-field"><label>Birthday</label><input type="date" id="kb-sheet-birthday" /></div>
+    <div class="kb-sheet-field"><label>Bio</label><textarea id="kb-sheet-bio" rows="2" maxlength="180"></textarea></div>
+    <div class="kb-sheet-note"><i class="fas fa-clock" style="margin-right:4px;"></i>Name, phone, gender and birthday can be changed once every 7 days. Bio can be changed anytime.</div>
+    <button type="button" class="btn-primary" onclick="saveEditProfileSheet()">Save changes</button>
+  </div>
 </div>
 
 <!-- MODALS -->
@@ -2150,7 +2172,7 @@ document.addEventListener('click', (e) => {
 }, true);
 // Do not infer offline from a slow Firebase/CDN response; only show offline when Android/browser reports no network.
 window.onNativeConnectivityChanged = function(online) { if (online && window.__kbOfflineShell) location.reload(); };
-window.addEventListener('online', () => { if (window.__kbOfflineShell) location.reload(); else { if (window.processExpiredMediaDeletion) window.processExpiredMediaDeletion(); if (window.scheduleAutoBackup) window.scheduleAutoBackup(); } });
+window.addEventListener('online', () => { if (window.__kbOfflineShell) location.reload(); else { if (window.processDeliveryAckQueue) window.processDeliveryAckQueue(); if (window.processExpiredMediaDeletion) window.processExpiredMediaDeletion(); if (window.scheduleAutoBackup) window.scheduleAutoBackup(); } });
 window.addEventListener('offline', () => { showOfflineShell(); KothaNative && KothaNative.toast('Internet connection lost'); });
 document.addEventListener('contextmenu', (e) => { if (e.target.closest('.bubble, .msg-row')) e.preventDefault(); });
 </script>
@@ -2190,8 +2212,18 @@ let msgUnsubscribe = null, chatUnsubscribe = null, presenceUnsubscribe = null, t
 let typingTimeout = null, typingDebounce = null;
 let allFriends = [], allChats = [], unreadCounts = {};
 let presenceListeners = {};
-const AUTO_DELETE_HOURS = 24;
-const AUTO_DELETE_MS = AUTO_DELETE_HOURS * 60 * 60 * 1000;
+// Delivery-based lifecycle: a server copy is ACK-deleted once the receiver has
+// persisted it locally. Undelivered copies are retried; there is no 24-hour purge.
+const DELIVERY_ACK_URL = 'https://kothabolbo.vercel.app/api/message/ack';
+const ACK_QUEUE_KEY = 'kb_delivery_ack_queue';
+function kbBridge(method, ...args) {
+  try { if (window.AndroidBridge && typeof AndroidBridge[method] === 'function') AndroidBridge[method](...args); } catch (_) {}
+}
+function setNativeNav(visible, tab) {
+  document.body.classList.add('kb-native-nav-space');
+  kbBridge('setNativeNavVisible', !!visible);
+  if (tab) kbBridge('setNativeNavTab', tab);
+}
 function avatarUrl(name, gender) {
   const seed = encodeURIComponent(name || 'User');
   if (gender === 'Female') return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&gender=female`;
@@ -2534,15 +2566,21 @@ window.backupNowToGoogleDrive = async function() {
   if (!window.AndroidBridge || !currentUser) return;
   if (!localStorage.getItem('kb_drive_email_' + currentUser.uid)) return;
   try {
-    const snap = await getDocs(collection(db, 'messages'));
-    const live = snap.docs.map(d => ({ id:d.id, ...d.data() })).filter(m => m.senderId === currentUser.uid || m.receiverId === currentUser.uid);
-    // Also include the device-local restored archive (survives the 24-hour server deletion).
+    const [sentSnap, receivedSnap] = await Promise.all([
+      getDocs(query(collection(db, 'messages'), where('senderId', '==', currentUser.uid))),
+      getDocs(query(collection(db, 'messages'), where('receiverId', '==', currentUser.uid)))
+    ]);
+    const live = [...sentSnap.docs, ...receivedSnap.docs].map(d => ({ id:d.id, ...d.data() }));
+    // Also include the on-device archive (survives server-side ACK deletion).
     const map = new Map();
     live.forEach(m => map.set(String(m.id), m));
     getRestoredMessages().forEach(m => { if (m && (m.senderId===currentUser.uid || m.receiverId===currentUser.uid)) map.set(String(m.id), m); });
     const messages = Array.from(map.values());
     const backup = { version:1, createdAt:new Date().toISOString(), user:{ uid:currentUser.uid, ...currentUserData }, messages };
-    AndroidBridge.backupToGoogleDrive(JSON.stringify(backup));
+    const serialized = JSON.stringify(backup);
+    // Stored locally so the backup result callback can publish metadata for the web app.
+    try { localStorage.setItem('kb_last_backup_meta_' + currentUser.uid, JSON.stringify({ messageCount: messages.length, sizeBytes: serialized.length })); } catch (_) {}
+    AndroidBridge.backupToGoogleDrive(serialized);
   } catch (e) { console.warn('[Drive] auto-backup prepare failed', e); }
 };
 function showDriveBackupAlert(title, message, icon, color) {
@@ -2555,7 +2593,17 @@ function showDriveBackupAlert(title, message, icon, color) {
 }
 window.onNativeDriveBackupResult = function(ok, message) {
   // Silent auto-backup: no toast on success, no intrusive popup.
-  if (ok && currentUser) { localStorage.setItem('kb_drive_last_'+currentUser.uid, new Date().toISOString()); updateDriveBackupUI(); return; }
+  if (ok && currentUser) {
+    localStorage.setItem('kb_drive_last_'+currentUser.uid, new Date().toISOString());
+    let stats = {};
+    try { stats = JSON.parse(localStorage.getItem('kb_last_backup_meta_' + currentUser.uid) || '{}'); } catch (_) {}
+    setDoc(doc(db, 'users', currentUser.uid, 'backup', 'meta'), {
+      lastBackupAt: serverTimestamp(), status: 'success',
+      messageCount: stats.messageCount || 0, sizeBytes: stats.sizeBytes || 0,
+      device: 'android', updatedAt: serverTimestamp()
+    }, { merge: true }).catch(() => {});
+    updateDriveBackupUI(); return;
+  }
   console.warn('[Drive] auto-backup failed:', message);
   if (!currentUser) return;
   if (message === 'DRIVE_STORAGE_FULL') updateDriveBackupUI();
@@ -2663,6 +2711,7 @@ function showAuthScreen() {
   document.getElementById('auth-screen').style.display='flex';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('conv-screen').classList.remove('open');
+  setNativeNav(false);
 }
 
 function playOnlineSound() {
@@ -2740,6 +2789,7 @@ async function checkForAppUpdate() {
 }
 
 function showApp() {
+  setNativeNav(true, 'chat');
   document.getElementById('auth-screen').style.display='none';
   const boot = document.getElementById('boot-loading'); if (boot) boot.style.display = 'none';
   document.getElementById('app').classList.add('visible');
@@ -2754,7 +2804,7 @@ function showApp() {
   loadChats(); loadFriends();
   setupPushNotifications();
   setTimeout(handleInitialChatDeepLink, 900);
-  setTimeout(deleteOldMessages, 5000);
+  setTimeout(processDeliveryAckQueue, 5000);
 }
 
 function listenPresence(uid) {
@@ -3068,31 +3118,23 @@ function friendlyError(code) {
 }
 
 window.switchTab = function(tab) {
-  // Profile is the user's own profile tab (not a screen from the nav set).
-  if (tab === 'profile') {
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('profile-screen').classList.add('active');
-    const nav=document.getElementById('nav-profile'); if (nav) nav.classList.add('active');
-    renderOwnProfileTab();
-    return;
-  }
+  if (tab === 'feed') tab = 'chat'; // Feed feature removed.
   const target = document.getElementById(tab+'-screen');
-  const alreadyActive = target && target.classList.contains('active');
+  if (!target) return;
+  const alreadyActive = target.classList.contains('active');
 
   if (alreadyActive) {
     if (tab === 'chat') { loadChats(); showToast('Chats refreshed'); }
-    else if (tab === 'feed') { showToast('Feed refreshed'); }
     else if (tab === 'settings') { updateUI(); populateAppVersion(); showToast('Settings refreshed'); }
     return;
   }
 
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   target.classList.add('active');
-  document.getElementById('nav-'+tab).classList.add('active');
-  if (tab==='chat') loadChats();
-  if (tab==='settings') { updateUI(); populateAppVersion(); }
+  kbBridge('setNativeNavTab', tab);
+  if (tab === 'chat') loadChats();
+  if (tab === 'settings') { updateUI(); populateAppVersion(); }
+  if (tab === 'profile') renderOwnProfileTab();
 };
 
 window.openFriendSearch = function() {
@@ -3235,14 +3277,75 @@ function messageStatusHTML(m) {
 
 function markDeliveredDocIfIncoming(docSnap, msg) {
   if (!currentUser || !docSnap || !msg) return;
-  if (msg.receiverId === currentUser.uid && msg.senderId !== currentUser.uid && msg.delivered !== true) {
-    updateDoc(doc(db, 'messages', docSnap.id), { delivered: true }).catch(() => {});
+  if (msg.receiverId === currentUser.uid && msg.senderId !== currentUser.uid) {
+    // Local-first: never delete the server copy before this device has a durable copy.
+    saveLocalMessage({ ...msg, id: docSnap.id });
+    queueDeliveryAck(docSnap.id);
+    if (msg.delivered !== true) {
+      updateDoc(doc(db, 'messages', docSnap.id), { delivered: true })
+        .then(() => processDeliveryAckQueue()).catch(() => {});
+    } else {
+      processDeliveryAckQueue();
+    }
   }
 }
 
 function restoredMessagesKey() { return 'kb_restored_messages_' + (currentUser?.uid || ''); }
 function getRestoredMessages() { try { const list=JSON.parse(localStorage.getItem(restoredMessagesKey())||'[]'); return Array.isArray(list)?list:[]; } catch (_) { return []; } }
 function saveRestoredMessages(messages) { try { localStorage.setItem(restoredMessagesKey(), JSON.stringify(messages)); } catch (_) {} }
+
+/** Persist a delivered/sent message on this device before asking the server to delete it. */
+function mirrorMessageMedia(msg) {
+  if (!window.AndroidBridge || !msg) return;
+  const kind = msg.type === 'image' ? 'photos' : msg.type === 'voice' ? 'audio' : null;
+  const url = msg.type === 'image' ? msg.imageUrl : msg.voiceUrl;
+  if (!kind || !url || String(url).startsWith('data:')) return;
+  const ext = kind === 'photos' ? 'jpg' : 'm4a';
+  const name = `${kind}_${String(msg.id).replace(/[^A-Za-z0-9_-]/g, '_')}.${ext}`;
+  try { AndroidBridge.mirrorMediaToAppFolder(url, kind, name); } catch (_) {}
+}
+function saveLocalMessage(msg) {
+  if (!msg || !msg.id || !currentUser) return;
+  if (msg.senderId !== currentUser.uid && msg.receiverId !== currentUser.uid) return;
+  const map = new Map(getRestoredMessages().map(m => [String(m.id), m]));
+  const isNew = !map.has(String(msg.id));
+  const item = { ...msg, id: String(msg.id), localSavedAt: (map.get(String(msg.id))?.localSavedAt) || new Date().toISOString() };
+  if (!item.timestamp || !item.timestamp.seconds) {
+    item.timestamp = { seconds: Math.floor((item.clientCreatedAt || Date.now()) / 1000) };
+  }
+  map.set(String(item.id), item);
+  // Bound the on-device archive so localStorage cannot grow without limit.
+  saveRestoredMessages(Array.from(map.values()).slice(-3000));
+  if (isNew) mirrorMessageMedia(item);
+}
+function getDeliveryAckQueue() { try { const a=JSON.parse(localStorage.getItem(ACK_QUEUE_KEY)||'[]'); return Array.isArray(a)?a:[]; } catch (_) { return []; } }
+function saveDeliveryAckQueue(items) { try { localStorage.setItem(ACK_QUEUE_KEY, JSON.stringify(items.slice(-500))); } catch (_) {} }
+function queueDeliveryAck(id) {
+  if (!id) return;
+  const q = getDeliveryAckQueue(); const key = String(id);
+  if (!q.includes(key)) { q.push(key); saveDeliveryAckQueue(q); }
+}
+async function processDeliveryAckQueue() {
+  if (!currentUser || !navigator.onLine) return;
+  const queue = getDeliveryAckQueue();
+  if (!queue.length) return;
+  let token;
+  try { token = await currentUser.getIdToken(); } catch (_) { return; }
+  const remaining = [];
+  for (const id of queue) {
+    try {
+      const res = await fetch(DELIVERY_ACK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ messageId: id })
+      });
+      // 404 means the server copy is already gone — treat it as acknowledged.
+      if (!res.ok && res.status !== 404) throw new Error('ack failed: ' + res.status);
+    } catch (_) { remaining.push(id); }
+  }
+  saveDeliveryAckQueue(remaining);
+}
+window.processDeliveryAckQueue = processDeliveryAckQueue;
 
 async function loadChats() {
   if (!currentUser) return;
@@ -3255,13 +3358,10 @@ async function loadChats() {
   chatUnsubscribe = onSnapshot(q, async (snap) => {
     const chatMap = {};   // uid → lastMsg (only non-deleted-for-me messages)
     const counts = {};
-    const cutoffDate = new Date(Date.now() - AUTO_DELETE_MS);
     
     snap.docs.forEach(d => {
       const msg = d.data();
       if (msg.senderId !== currentUser.uid && msg.receiverId !== currentUser.uid) return;
-      const msgDate = msg.timestamp ? new Date(msg.timestamp.seconds * 1000) : new Date();
-      if (msgDate < cutoffDate) return;
       // Skip messages soft-deleted for current user
       if (Array.isArray(msg.deletedFor) && msg.deletedFor.includes(currentUser.uid)) return;
       markDeliveredDocIfIncoming(d, msg);
@@ -3275,7 +3375,7 @@ async function loadChats() {
     });
     
     // Restored backups are intentionally device-local. They survive offline use and are
-    // never put back into the 24-hour server message collection.
+    // never re-upload a locally archived message to the server collection.
     getRestoredMessages().forEach(msg => {
       if (!msg || (msg.senderId !== currentUser.uid && msg.receiverId !== currentUser.uid)) return;
       const oid = msg.senderId === currentUser.uid ? msg.receiverId : msg.senderId;
@@ -3474,28 +3574,8 @@ window.loadFriends = async function() {
   if(btn) { btn.disabled=false; btn.style.opacity='1'; }
 };
 
-async function deleteOldMessages() {
-  if (!currentUser) return;
-  const cutoff = Date.now() - AUTO_DELETE_MS;
-  try {
-    // Physical Firestore cleanup: removes this account's expired messages from the server.
-    const sentQ = query(collection(db, 'messages'), where('senderId', '==', currentUser.uid));
-    const recvQ = query(collection(db, 'messages'), where('receiverId', '==', currentUser.uid));
-    const [sent, received] = await Promise.all([getDocs(sentQ), getDocs(recvQ)]);
-    const unique = new Map(); [...sent.docs, ...received.docs].forEach(d => unique.set(d.id, d));
-    const expired = [...unique.values()].filter(d => {
-      const t = d.data().timestamp;
-      return t?.seconds && t.seconds * 1000 < cutoff;
-    });
-    await Promise.all(expired.map(d => deleteDoc(doc(db, 'messages', d.id))));
-    if (expired.length) console.log('[Auto-clean] Permanently deleted expired messages:', expired.length);
-  } catch (e) { console.warn('[Auto-clean] Firestore cleanup failed:', e); }
-  try {
-    // Backend removes matching ImageKit media files as well.
-    const idToken = await currentUser.getIdToken();
-    await fetch('/api/cleanup-old-media', { method: 'POST', headers: { 'Authorization': 'Bearer ' + idToken } });
-  } catch(e) { console.warn('[Auto-clean] Media cleanup failed:', e); }
-}
+// Kept as a no-op alias: the 24-hour purge was replaced by delivery ACK deletion.
+async function deleteOldMessages() { return processDeliveryAckQueue(); }
 
 function maskEmail(email, isPublic) {
   if (!email) return '';
@@ -3594,6 +3674,8 @@ window.openConversation = function(user) {
   if (!user || user.uid === currentUser?.uid) { showToast('You cannot message yourself', 'error'); return; }
   if (window.closeFriendSearch) closeFriendSearch();
   closeConversation();
+  // closeConversation() restores the tab bar for list screens; hide it again for the chat.
+  kbBridge('setNativeNavVisible', false);
   openChatUser = user;
   // Opening or replying in a chat clears its matching native notification.
   if (window.AndroidBridge && user.uid) AndroidBridge.cancelNotificationForChat(user.uid);
@@ -3606,7 +3688,7 @@ window.openConversation = function(user) {
   const noticeEl = document.createElement('div');
   noticeEl.className = 'auto-delete-notice';
   noticeEl.id = 'auto-delete-notice';
-  noticeEl.innerHTML = '<i class="fas fa-clock"></i> Messages are automatically deleted after 24 hours to protect your privacy.';
+  noticeEl.innerHTML = '<i class="fas fa-shield-alt"></i> Messages leave our server once delivered and stay saved on this device.';
   convMsgsEl.appendChild(noticeEl);
   document.getElementById('typing-row').classList.remove('visible');
   document.getElementById('conv-screen').classList.add('open');
@@ -3781,6 +3863,7 @@ window.closeConversation = function() {
   if(typingUnsubscribe){typingUnsubscribe();typingUnsubscribe=null;}
   clearTimeout(typingTimeout); clearTimeout(typingDebounce);
   openChatUser=null;
+  setNativeNav(true);
 };
 
 let renderedMsgIds = new Set();
@@ -3793,9 +3876,6 @@ let _initialLoadChats = false;
 function handleMsgChange(change, c) {
   const d = change.doc;
   const m = { ...d.data(), id: d.id };
-  const cutoffDate = new Date(Date.now() - AUTO_DELETE_MS);
-  const msgDate = m.timestamp ? new Date(m.timestamp.seconds * 1000) : new Date();
-  if (msgDate < cutoffDate) return false;
   if (change.type === 'added' && !renderedMsgIds.has(d.id)) {
     // Skip messages soft-deleted for current user
     if (Array.isArray(m.deletedFor) && m.deletedFor.includes(currentUser.uid)) return false;
@@ -3894,11 +3974,11 @@ function subscribeMessages() {
   c.onscroll = () => { if (c.scrollHeight - c.scrollTop - c.clientHeight < 60 && newButton) newButton.style.display = 'none'; };
 
   // Add this device's restored archive first. It remains available offline and is
-  // intentionally not subject to the server's 24-hour deletion.
+  // intentionally kept on this device after the server copy is ACK-deleted.
   getRestoredMessages().filter(m => m && ((m.senderId === currentUser.uid && m.receiverId === openChatUser.uid) || (m.senderId === openChatUser.uid && m.receiverId === currentUser.uid))).forEach((m, i) => {
     // Keep the original Firestore message ID. When that message still exists on the
     // server, its initial snapshot sees the same ID and skips it instead of rendering
-    // a second copy. If it was deleted after 24 hours, this local copy remains visible.
+    // a second copy. If the server copy was ACK-deleted, this local copy remains visible.
     const id = String(m.id || ('local_restore_' + i));
     if (!renderedMsgIds.has(id)) { renderedMsgIds.add(id); _msgBuffer[id] = { ...m, id, localRestored: true }; }
   });
@@ -3928,9 +4008,7 @@ function subscribeMessages() {
     if (!_initialLoadDone) {
       snap.docs.forEach(d => {
         const m = { ...d.data(), id: d.id };
-        const cutoffDate = new Date(Date.now() - AUTO_DELETE_MS);
-        const msgDate = m.timestamp ? new Date(m.timestamp.seconds * 1000) : new Date();
-        if (msgDate >= cutoffDate && !renderedMsgIds.has(d.id)) {
+        if (!renderedMsgIds.has(d.id)) {
           renderedMsgIds.add(d.id);
           _msgBuffer[d.id] = m;
           markDeliveredDocIfIncoming(d, m);
@@ -3959,9 +4037,7 @@ function subscribeMessages() {
     if (!_initialLoadDone) {
       snap.docs.forEach(d => {
         const m = { ...d.data(), id: d.id };
-        const cutoffDate = new Date(Date.now() - AUTO_DELETE_MS);
-        const msgDate = m.timestamp ? new Date(m.timestamp.seconds * 1000) : new Date();
-        if (msgDate >= cutoffDate && !renderedMsgIds.has(d.id)) {
+        if (!renderedMsgIds.has(d.id)) {
           renderedMsgIds.add(d.id);
           _msgBuffer[d.id] = m;
           markDeliveredDocIfIncoming(d, m);
@@ -4084,10 +4160,12 @@ window.msgInputChanged = function() {
   const input = document.getElementById('msg-input');
   const text = input.value.trim();
   const sendBtn = document.getElementById('send-btn');
+  const voiceBtn = document.getElementById('voice-btn');
   // Don't mess with buttons during recording
   if (_isRecording) return;
-  if (text) { sendBtn.style.display='flex'; }
-  else { sendBtn.style.display='none'; }
+  // Empty composer → voice button. Typing → send button.
+  if (sendBtn) sendBtn.style.display = text ? 'flex' : 'none';
+  if (voiceBtn) voiceBtn.style.display = text ? 'none' : 'flex';
   // Save draft + typing indicator. Keeping it here makes typing work even if
   // a separate input event listener fails to attach.
   if (openChatUser) {
@@ -4121,12 +4199,14 @@ function _voiceSetRecordingUI(on) {
   const inputW   = document.getElementById('msg-input-wrap-main');
   const recBar   = document.getElementById('voice-rec-bar');
   const sendBtn  = document.getElementById('send-btn');
+  const voiceBtn = document.getElementById('voice-btn');
   const leftBtns = document.getElementById('input-left-btns');
 
   if (on) {
     if (inputW) inputW.style.display = 'none';
     if (recBar) recBar.style.display = 'flex';
     if (sendBtn) sendBtn.style.display = 'none';
+    if (voiceBtn) voiceBtn.style.display = 'none';
     if (leftBtns) leftBtns.style.display = 'none';
   } else {
     if (inputW) inputW.style.display = 'flex';
@@ -4308,8 +4388,8 @@ window.sendVoiceWhileRecording = async function() {
       const duration = actualDuration;
       const msgData = { senderId:currentUser.uid, receiverId:openChatUser.uid, text:'', type:'voice', voiceUrl:voiceUpload.url, voiceFileId:voiceUpload.fileId || '', voiceDuration:duration, timestamp:serverTimestamp(), clientCreatedAt:Date.now(), delivered:false, read:false, seen:false };
       const savedVoiceMessage = await addDoc(collection(db, 'messages'), msgData);
+      saveLocalMessage({ ...msgData, id: savedVoiceMessage.id });
       scheduleAutoBackup();
-      scheduleOneMinuteMediaDeletion(voiceUpload.fileId || '');
       playMsgSound();
       const push = buildMessageNotificationPayload('voice', '', voiceUpload.url, { duration:_voiceFormatTime(duration) }); push.messageId = savedVoiceMessage.id;
       sendPushNotificationToReceiver(openChatUser.uid, push);
@@ -4351,8 +4431,9 @@ window.sendVoiceWhileRecording = async function() {
         timestamp: serverTimestamp(), clientCreatedAt: Date.now(), delivered: false, read: false, seen: false
       };
       if (_replyingTo) { msgData.replyTo = { id: _replyingTo.id, text: _replyingTo.text, senderName: _replyingTo.senderName }; cancelReply(); }
-      await addDoc(collection(db, 'messages'), msgData);
-      scheduleOneMinuteMediaDeletion(voiceUpload.fileId || '');
+      const savedVoice = await addDoc(collection(db, 'messages'), msgData);
+      saveLocalMessage({ ...msgData, id: savedVoice.id });
+      scheduleAutoBackup();
       playMsgSound();
       sendPushNotificationToReceiver(openChatUser.uid, buildMessageNotificationPayload('voice', '', voiceUrl, { duration: _voiceFormatTime(duration) }));
       const c = document.getElementById('conv-messages');
@@ -4523,6 +4604,7 @@ window.sendMessage = async function() {
   if (_replyingTo) { msgData.replyTo = { id: _replyingTo.id, text: _replyingTo.text, senderName: _replyingTo.senderName }; cancelReply(); }
   try {
     const savedMessage = await addDoc(collection(db,'messages'), msgData);
+    saveLocalMessage({ ...msgData, id: savedMessage.id });
     scheduleAutoBackup();
     // Keep the composer active for a fast continuous chat experience.
     // Keep the already-visible keyboard stable; invoking Android's keyboard API here caused a visible blink.
@@ -4539,6 +4621,46 @@ window.msgKeyDown = function(e) { /* Enter adds newline only; use Send button */
 document.getElementById('msg-input').addEventListener('input',()=>{ if (window.msgInputChanged) msgInputChanged(); });
 // Tapping Send must not steal focus from the textarea, otherwise Android closes the keyboard.
 document.getElementById('send-btn').addEventListener('pointerdown', e => e.preventDefault());
+
+window.openEditProfileSheet = function() {
+  if (!currentUser) return;
+  const u = currentUserData || {};
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('kb-sheet-name', u.displayName || '');
+  set('kb-sheet-phone', u.phone || '');
+  set('kb-sheet-gender', u.gender || '');
+  set('kb-sheet-bio', u.bio || '');
+  const y = u.birthYear, m = u.birthMonth, d = u.birthDay;
+  set('kb-sheet-birthday', (y && m && d) ? `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}` : '');
+  document.getElementById('edit-profile-sheet').classList.add('open');
+};
+window.closeEditProfileSheet = function() {
+  const el = document.getElementById('edit-profile-sheet');
+  if (el) el.classList.remove('open');
+};
+window.saveEditProfileSheet = function() {
+  const name = document.getElementById('kb-sheet-name').value.trim();
+  const phone = document.getElementById('kb-sheet-phone').value.trim();
+  const gender = document.getElementById('kb-sheet-gender').value;
+  const bio = document.getElementById('kb-sheet-bio').value.trim();
+  const birthday = document.getElementById('kb-sheet-birthday').value;
+  if (!name) { showToast('Name required', 'error'); return; }
+  if (!gender) { showToast('Please select gender', 'error'); return; }
+  document.getElementById('edit-name').value = name;
+  document.getElementById('edit-phone').value = phone;
+  document.getElementById('edit-bio').value = bio;
+  document.getElementById('edit-gender').value = gender;
+  const genderDisplay = document.getElementById('edit-gender-display-text');
+  if (genderDisplay) { genderDisplay.textContent = gender; genderDisplay.classList.add('selected'); }
+  const parts = birthday ? birthday.split('-') : [];
+  document.getElementById('edit-birth-year').value = parts[0] || '';
+  document.getElementById('edit-birth-month').value = parts[1] ? String(Number(parts[1])) : '';
+  document.getElementById('edit-birth-day').value = parts[2] ? String(Number(parts[2])) : '';
+  const dobDisplay = document.getElementById('edit-dob-display-text');
+  if (dobDisplay) dobDisplay.textContent = birthday || 'Set Birthday';
+  window.closeEditProfileSheet();
+  window.saveProfile();
+};
 
 window.openEditProfile = function() {
   const lastEdit = currentUserData?.lastProfileEdit;
@@ -4811,6 +4933,10 @@ window.confirmLogout = async function() {
   closeModal('logout-confirm-modal');
   try {
     if (currentUser) {
+      // Best-effort final backup before the Firebase/Google sessions are dropped.
+      if (window.backupNowToGoogleDrive) {
+        await Promise.race([window.backupNowToGoogleDrive(), new Promise(r => setTimeout(r, 8000))]);
+      }
       await set(ref(rtdb, `status/${currentUser.uid}`), { online: false, lastSeen: rtdbTimestamp() });
       const token = window.AndroidBridge ? AndroidBridge.getFcmToken() : '';
       if (token) await updateDoc(doc(db,'users',currentUser.uid), { fcmTokens: arrayRemove(token), fcmToken: '' }).catch(()=>{});
@@ -5225,7 +5351,16 @@ window.openProfilePage = function(user) {
   document.getElementById('pp-birthday').textContent = birthdayVal;
 
   document.getElementById('profile-page').classList.add('open');
+  kbBridge('setNativeNavVisible', false);
   history.pushState({ profilePage: true }, '');
+};
+
+// The profile overlay previously had a back button but no close handler.
+window.closeProfilePage = function() {
+  const el = document.getElementById('profile-page');
+  if (el) el.classList.remove('open');
+  const convOpen = document.getElementById('conv-screen')?.classList.contains('open');
+  if (convOpen) kbBridge('setNativeNavVisible', false); else setNativeNav(true);
 };
 
 window.renderOwnProfileTab = function() {
@@ -5258,6 +5393,22 @@ window.openChatFromProfilePage = function() {
 let _friendProfileUser = null;
 window.openFriendProfile = function(user) {
   openProfilePage(user);
+};
+// The compact friend sheet is kept for legacy callers; these handlers make sure
+// its close/chat buttons never throw even if the sheet is opened directly.
+window.closeFriendProfileDirect = function() {
+  const overlay = document.getElementById('friend-profile-overlay');
+  if (overlay) overlay.classList.remove('open');
+  _friendProfileUser = null;
+};
+window.closeFriendProfile = function(event) {
+  if (event && event.target && event.target.closest && event.target.closest('.friend-profile-sheet')) return;
+  window.closeFriendProfileDirect();
+};
+window.startChatFromProfile = function() {
+  const user = _friendProfileUser;
+  window.closeFriendProfileDirect();
+  if (user) openConversation(user);
 };
   
 // ── Smart soft-delete: if both users deleted → permanent delete from server ──
@@ -5351,17 +5502,19 @@ const IK_PUBLIC_KEY = 'public_o5b4VUN6FacV5cteyv/+OIygfww=';
 const IK_URL_ENDPOINT = 'https://ik.imagekit.io/sayemgogo/';
 const IK_UPLOAD_URL = 'https://upload.imagekit.io/api/v1/files/upload';
 
-// ⚠️ IMPORTANT: Replace this with your actual Vercel deployment URL
-// e.g. 'https://your-app.vercel.app/api/imagekit-auth'
-const IK_AUTH_ENDPOINT = window.IK_AUTH_ENDPOINT || '/api/imagekit-auth';
+// Signing happens only on the Vercel server. The client never sees the private key.
+const IK_AUTH_ENDPOINT = window.IK_AUTH_ENDPOINT || 'https://kothabolbo.vercel.app/api/imagekit-auth';
 
-async function getImageKitAuth() {
+async function getImageKitAuth(folder) {
   try {
-    const res = await fetch(IK_AUTH_ENDPOINT);
+    const idToken = currentUser ? await currentUser.getIdToken() : '';
+    const res = await fetch(IK_AUTH_ENDPOINT + '?folder=' + encodeURIComponent(folder || 'uploads'), {
+      headers: idToken ? { 'Authorization': 'Bearer ' + idToken } : {}
+    });
     if (!res.ok) throw new Error('Auth endpoint failed: ' + res.status);
-    return await res.json(); // { signature, token, expire }
+    return await res.json(); // { signature, token, expire, folder }
   } catch(e) {
-    console.warn('[ImageKit] Auth endpoint failed, trying unsigned upload:', e.message);
+    console.warn('[ImageKit] Auth endpoint failed:', e.message);
     return null;
   }
 }
@@ -5370,7 +5523,7 @@ async function uploadToImageKit(file, folder) {
   const fileName = (folder || 'uploads') + '_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.]/g, '_');
   
   // Step 1: Try authenticated upload via Vercel backend
-  const auth = await getImageKitAuth();
+  const auth = await getImageKitAuth(folder || 'uploads');
   
   const formData = new FormData();
   formData.append('file', file);
@@ -5378,13 +5531,13 @@ async function uploadToImageKit(file, folder) {
   formData.append('publicKey', IK_PUBLIC_KEY);
   formData.append('folder', '/' + (folder || 'uploads'));
   
-  if (auth && auth.signature && auth.token && auth.expire) {
-    // Authenticated upload (secure — private key never exposed)
-    formData.append('signature', auth.signature);
-    formData.append('token', auth.token);
-    formData.append('expire', auth.expire);
+  if (!auth || !auth.signature || !auth.token || !auth.expire) {
+    throw new Error('ImageKit authentication failed. Please sign in again.');
   }
-  // If no auth, ImageKit will reject unless "Unsigned uploads" is enabled in dashboard
+  // Authenticated upload (secure — private key never exposed)
+  formData.append('signature', auth.signature);
+  formData.append('token', auth.token);
+  formData.append('expire', auth.expire);
   
   const uploadController = new AbortController();
   const uploadTimeout = setTimeout(() => uploadController.abort(), 30000);
@@ -5584,8 +5737,8 @@ window.confirmSendImage = async function() {
       cancelReply();
     }
     const savedImageMessage = await addDoc(collection(db, 'messages'), msgData);
+    saveLocalMessage({ ...msgData, id: savedImageMessage.id });
     scheduleAutoBackup();
-    scheduleOneMinuteMediaDeletion(imageUpload.fileId || '');
     playMsgSound();
     const push = buildMessageNotificationPayload('image', '', url); push.messageId = savedImageMessage.id;
     sendPushNotificationToReceiver(openChatUser.uid, push);

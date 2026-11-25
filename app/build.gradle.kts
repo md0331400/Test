@@ -7,11 +7,31 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+// Signing material is never committed. Local builds may keep a gitignored
+// release.properties; CI/AndroidIDE should provide KB_* environment variables.
 val releaseProperties = Properties()
 val releasePropertiesFile = rootProject.file("release.properties")
-if (!releasePropertiesFile.exists()) throw GradleException("Missing release.properties in project root")
-releaseProperties.load(FileInputStream(releasePropertiesFile))
-fun releaseValue(key: String) = releaseProperties.getProperty(key) ?: throw GradleException("Missing $key in release.properties")
+if (releasePropertiesFile.exists()) FileInputStream(releasePropertiesFile).use { releaseProperties.load(it) }
+fun releaseValue(key: String): String? {
+    val envName = when (key) {
+        "storeFile" -> "KB_STORE_FILE"
+        "storePassword" -> "KB_STORE_PASSWORD"
+        "keyAlias" -> "KB_KEY_ALIAS"
+        "keyPassword" -> "KB_KEY_PASSWORD"
+        else -> throw GradleException("Unknown release value: $key")
+    }
+    return System.getenv(envName)?.takeIf { it.isNotBlank() }
+        ?: releaseProperties.getProperty(key)?.takeIf { it.isNotBlank() }
+}
+
+val releaseStoreFile = releaseValue("storeFile")
+val releaseStorePassword = releaseValue("storePassword")
+val releaseKeyAlias = releaseValue("keyAlias")
+val releaseKeyPassword = releaseValue("keyPassword")
+val hasReleaseSigning = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { !it.isNullOrBlank() }
+if (!hasReleaseSigning) {
+    logger.lifecycle("Release signing is not configured. Set KB_STORE_FILE/KB_STORE_PASSWORD/KB_KEY_ALIAS/KB_KEY_PASSWORD (or gitignored release.properties) to produce a signed release. Debug and unsigned verification builds still work.")
+}
 
 android {
     namespace = "com.amisayem.kothabolbo"
@@ -26,11 +46,13 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = rootProject.file(releaseValue("storeFile"))
-            storePassword = releaseValue("storePassword")
-            keyAlias = releaseValue("keyAlias")
-            keyPassword = releaseValue("keyPassword")
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile!!)
+                storePassword = releaseStorePassword!!
+                keyAlias = releaseKeyAlias!!
+                keyPassword = releaseKeyPassword!!
+            }
         }
     }
 
@@ -38,7 +60,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
