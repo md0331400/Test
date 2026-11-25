@@ -1,0 +1,4 @@
+#Wed Nov 25 23:45:52 BDT 2026
+base.0=/home/amisayem/Documents/Kotha Bolbo/Kotha Bolbo2/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
