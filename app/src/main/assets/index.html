@@ -1611,8 +1611,18 @@ button, .btn-primary, .btn-secondary, .friend-chat-btn, .fp-chat-btn, .voice-btn
 /* One status indicator only, and only when genuinely online. */
 .status-dot.offline { display: none; }
 .status-dot:not(.offline) { animation: none; box-shadow: 0 0 0 2px var(--bg-secondary); }
-/* Keep the last friend row clear of the native bar. */
-.kb-native-nav-space #friend-screen > .scroll-area { padding-bottom: 112px !important; }
+/* Keep the last row physically above the native bar, not just padded inside it. */
+.kb-native-nav-space #friend-screen > .scroll-area,
+.kb-native-nav-space #chat-screen > .scroll-area {
+  margin-bottom: 88px;
+  padding-bottom: 12px !important;
+}
+.kb-native-nav-space #profile-screen .profile-page-body { margin-bottom: 88px; }
+/* Rounded profile cover card. */
+#profile-screen .pp-hero { margin:12px; border-radius:18px; overflow:hidden; }
+#profile-screen .pp-cover-img { border-radius:18px 18px 0 0; }
+#profile-page .pp-hero { margin:12px; border-radius:18px; overflow:hidden; }
+#profile-page .pp-cover-img { border-radius:18px 18px 0 0; }
 
 </style>
 </head>
