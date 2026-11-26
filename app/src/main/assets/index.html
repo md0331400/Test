@@ -7,7 +7,7 @@
   <!-- ImageKit Auth Endpoint — Replace this URL with your Vercel deployment URL -->
   <script>window.IK_AUTH_ENDPOINT = 'https://kothabolbo.vercel.app/api/imagekit-auth';</script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,500;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
   <style>
@@ -41,7 +41,7 @@
     }
 
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; width:100%; overflow:hidden; font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); font-size: 15px; }
+    html, body { height:100%; width:100%; overflow:hidden; font-family:'Google Sans','Roboto','Noto Sans Bengali',sans-serif; background:var(--bg-primary); color:var(--text-primary); font-size: 15px; }
 
     .auth-mini-logo {
       width: 50px; height:50px; margin:0 auto 12px;
@@ -57,7 +57,7 @@
       padding:0; overflow-y:auto;
     }
     .auth-logo { text-align:center; margin-bottom:24px; }
-    .auth-logo h1 { font-family:'Exo 2',sans-serif; font-size:1.6rem; font-weight:700; background:linear-gradient(135deg,#00d4ff,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .auth-logo h1 { font-family:inherit; font-size:1.6rem; font-weight:700; color:var(--text-primary); }
     .auth-logo p { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
     .auth-card { width:100%; max-width:360px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
     .auth-tabs { display:flex; gap:4px; margin-bottom:20px; background:var(--bg-secondary); border-radius:var(--radius-sm); padding:3px; }
@@ -258,7 +258,7 @@
     .msg-input-area { display:flex; align-items:flex-end; gap:8px; padding:8px 10px; background:var(--bg-secondary); border-top:1px solid var(--border); flex-shrink:0; }
     .msg-input-wrap { flex:1; background:var(--bg-input); border-radius:999px; border:1.5px solid var(--border); display:flex; align-items:center; padding:0 12px; transition:var(--transition); }
     .msg-input-wrap:focus-within { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
-    .msg-input-wrap textarea { flex:1; border:none; background:transparent; color:var(--text-primary); font-family:inherit; font-size:0.85rem; outline:none; resize:none; padding:10px 0; max-height:80px; }
+    .msg-input-wrap textarea { flex:1; border:none; background:transparent; color:var(--text-primary); font-family:'Noto Sans Bengali','Google Sans',sans-serif; font-size:0.85rem; outline:none; resize:none; padding:10px 0; max-height:80px; }
     .msg-input-wrap textarea::placeholder { color:var(--text-muted); }
     .send-btn { width:40px; height:40px; border-radius:50%; border:none; background:linear-gradient(135deg,#00d4ff,#0099cc); color:#000; font-size:16px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
     .send-btn:hover { transform:scale(1.08); box-shadow:0 4px 14px rgba(0,212,255,0.4); }
@@ -314,7 +314,7 @@
     .profile-name { font-size:1.1rem; font-weight:700; }
     .profile-email { font-size:0.7rem; color:var(--text-secondary); }
     .settings-section { padding:12px; }
-    .settings-section h3 { font-size:0.7rem; font-weight:700; color:var(--accent); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:8px; }
+    .settings-section h3 { font-size:0.75rem; font-weight:700; color:var(--text-primary); margin-bottom:8px; }
     .settings-card { background:var(--bg-card); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; }
     .settings-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; transition:var(--transition); }
     .settings-row:last-child { border-bottom:none; }
@@ -1599,20 +1599,35 @@
 .kb-sheet-trigger { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
 .kb-sheet-note { font-size:.66rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px; }
 .kb-native-nav-space #edit-profile-sheet .kb-sheet-card { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+/* Matte search fields — quiet chrome per unslop pass. */
+.search-bar .search-wrap, .search-bar .search-wrap:focus-within {
+  background: var(--bg-secondary); border-color: var(--border); box-shadow: none;
+}
+.search-bar .search-wrap:focus-within { border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.search-bar i, .search-bar .search-wrap:focus-within i { color: var(--text-muted); transform: none; transition: none; }
+/* Type roles: headings bold, controls medium. */
+h1, h2, h3, .settings-section h3 { font-family:'Google Sans','Roboto','Noto Sans Bengali',sans-serif; font-weight:700; }
+button, .btn-primary, .btn-secondary, .friend-chat-btn, .fp-chat-btn, .voice-btn, .send-btn { font-family:'Google Sans','Roboto','Noto Sans Bengali',sans-serif; font-weight:500; }
+/* One status indicator only, and only when genuinely online. */
+.status-dot.offline { display: none; }
+.status-dot:not(.offline) { animation: none; box-shadow: 0 0 0 2px var(--bg-secondary); }
+/* Keep the last friend row clear of the native bar. */
+.kb-native-nav-space #friend-screen > .scroll-area { padding-bottom: 112px !important; }
+
 </style>
 </head>
 
 
 <div id="auth-screen"></div>
 <div id="native-first-splash" style="position:fixed;inset:0;z-index:1000001;background:radial-gradient(ellipse at center,#0f172a 0%,#020617 100%);display:flex;align-items:center;justify-content:center;">
-  <style>#native-first-splash .nfs{display:flex;flex-direction:column;align-items:center;gap:18px;animation:nfsin .65s ease}.nfs-logo{width:100px;height:100px;position:relative;display:flex;align-items:center;justify-content:center}.nfs-logo:before,.nfs-logo:after{content:'';position:absolute;border-radius:50%;border:2px solid transparent;animation:nfsring 2.5s linear infinite}.nfs-logo:before{width:96px;height:96px;border-top-color:#00d4ff;border-right-color:rgba(0,212,255,.25)}.nfs-logo:after{width:78px;height:78px;border-bottom-color:#7c3aed;border-left-color:rgba(124,58,237,.35);animation-direction:reverse}.nfs-bubble{width:68px;height:68px;border-radius:50% 50% 50% 20%;background:linear-gradient(135deg,#00d4ff,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 30px rgba(0,212,255,.55);z-index:1;animation:nfsfloat 2s ease-in-out infinite}.nfs-title{font-family:'Exo 2',sans-serif;font-size:2rem;font-weight:700;letter-spacing:2px;background:linear-gradient(135deg,#00d4ff,#7c3aed);-webkit-background-clip:text;color:transparent}.nfs-sub{font-size:.68rem;color:#b0c4de;letter-spacing:3px;text-transform:uppercase}@keyframes nfsring{to{transform:rotate(360deg)}}@keyframes nfsfloat{50%{transform:translateY(-5px)}}@keyframes nfsin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}</style>
+  <style>#native-first-splash .nfs{display:flex;flex-direction:column;align-items:center;gap:18px;animation:nfsin .65s ease}.nfs-logo{width:100px;height:100px;position:relative;display:flex;align-items:center;justify-content:center}.nfs-logo:before,.nfs-logo:after{content:'';position:absolute;border-radius:50%;border:2px solid transparent;animation:nfsring 2.5s linear infinite}.nfs-logo:before{width:96px;height:96px;border-top-color:#00d4ff;border-right-color:rgba(0,212,255,.25)}.nfs-logo:after{width:78px;height:78px;border-bottom-color:#7c3aed;border-left-color:rgba(124,58,237,.35);animation-direction:reverse}.nfs-bubble{width:68px;height:68px;border-radius:50% 50% 50% 20%;background:linear-gradient(135deg,#00d4ff,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 0 30px rgba(0,212,255,.55);z-index:1;animation:nfsfloat 2s ease-in-out infinite}.nfs-title{font-family:'Google Sans','Roboto',sans-serif;font-size:2rem;font-weight:700;letter-spacing:1px;color:#e8f0fe}.nfs-sub{font-size:.68rem;color:#b0c4de;letter-spacing:3px;text-transform:uppercase}@keyframes nfsring{to{transform:rotate(360deg)}}@keyframes nfsfloat{50%{transform:translateY(-5px)}}@keyframes nfsin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}</style>
   <div class="nfs"><div class="nfs-logo"><div class="nfs-bubble"><i class="fas fa-comment-dots"></i></div></div><div class="nfs-title">Kotha Bolbo</div><div class="nfs-sub">Created by Sayem</div></div>
 </div>
 <script>(function(){const key='kb_native_splash_seen_v1',el=document.getElementById('native-first-splash');if(localStorage.getItem(key)==='1'){el.remove();return;}localStorage.setItem(key,'1');setTimeout(()=>{el.style.transition='opacity .5s';el.style.opacity='0';setTimeout(()=>el.remove(),520)},4500);})();</script>
 <div id="conv-screen">
   <div class="app-header">
     <button class="header-back" onclick="closeConversation()"><i class="fas fa-arrow-left"></i></button>
-    <div class="chat-avatar" onclick="window.openConversationProfile&&window.openConversationProfile()" style="width:30px;height:30px;flex-shrink:0;cursor:pointer;"><img id="conv-avatar" src="" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);" /><div class="status-dot" id="conv-status-dot"></div><div class="gender-dot" id="conv-gender-dot" style="display:none;width:12px;height:12px;font-size:6px;"></div></div>
+    <div class="chat-avatar" onclick="window.openConversationProfile&&window.openConversationProfile()" style="width:30px;height:30px;flex-shrink:0;cursor:pointer;"><img id="conv-avatar" src="" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);" /><div class="status-dot" id="conv-status-dot"></div></div>
     <div class="header-info" onclick="window.openConversationProfile&&window.openConversationProfile()" style="cursor:pointer;"><h2 id="conv-name"></h2><span id="conv-status-text">Offline</span></div>
   </div>
   <div class="conv-messages" id="conv-messages">
@@ -2250,7 +2265,7 @@ function showNativeSplashAnimation() {
       .kb-splash-bubble{width:70px;height:70px;background:linear-gradient(135deg,#00d4ff,#7c3aed);border-radius:50% 50% 50% 20%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,212,255,.5),0 0 60px rgba(124,58,237,.3);animation:kbBubbleFloat 2.4s ease-in-out infinite;position:relative;z-index:2;}
       .kb-splash-bubble i{font-size:28px;color:#fff;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3));margin-left:3px;}
       @keyframes kbBubbleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-      .kb-splash-title{font-family:'Exo 2','Segoe UI',system-ui,sans-serif;font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,#00d4ff 0%,#7c3aed 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:3px;filter:drop-shadow(0 0 18px rgba(0,212,255,.6));animation:kbTitlePulse 2.2s ease-in-out infinite alternate;margin-top:6px;}
+      .kb-splash-title{font-family:'Google Sans','Roboto',sans-serif;font-size:2.2rem;font-weight:700;color:var(--text-primary);letter-spacing:1px;margin-top:6px;}
       @keyframes kbTitlePulse{from{filter:drop-shadow(0 0 8px rgba(0,212,255,.5))}to{filter:drop-shadow(0 0 22px rgba(124,58,237,.8))}}
       .kb-splash-sub{font-size:.7rem;color:#b0c4de;letter-spacing:3px;text-transform:uppercase;opacity:.8;animation:kbFadeSub 2s ease-in-out infinite alternate;}
       @keyframes kbFadeSub{0%{opacity:.4}100%{opacity:1}}
@@ -2641,13 +2656,6 @@ async function fetchMyData() {
   if (!shown) showApp();
 }
 
-function genderDotHTML(gender) {
-  if (!gender) return '';
-  const cfg = { 'Male': { cls:'male', icon:'fa-mars' }, 'Female': { cls:'female', icon:'fa-venus' }, 'Other': { cls:'other', icon:'fa-genderless' } };
-  const c = cfg[gender]; if (!c) return '';
-  return `<div class="gender-dot ${c.cls}"><i class="fas ${c.icon}"></i></div>`;
-}
-
 function applyGenderDot(dotEl, gender) {
   if (!dotEl) return;
   if (!gender) { dotEl.style.display='none'; return; }
@@ -2804,7 +2812,7 @@ function listenPresence(uid) {
   presenceUnsubscribe = onValue(ref(rtdb, `status/${uid}`), (snap) => {
     const data = snap.val();
     if (data && openChatUser) {
-      openChatUser.online = data.online === true;
+      openChatUser.online = (data?.online === true && (() => { const t = data?.lastSeen; return typeof t === 'number' && Date.now() - t < 180000; })());
       openChatUser.lastSeen = data.lastSeen || null;
       updateConvHeader();
     }
@@ -2816,7 +2824,7 @@ function listenAllPresence() {
     if (!presenceListeners[uid]) {
       presenceListeners[uid] = onValue(ref(rtdb, `status/${uid}`), (snap) => {
         const data = snap.val();
-        const online = data?.online === true;
+        const online = (data?.online === true && (() => { const t = data?.lastSeen; return typeof t === 'number' && Date.now() - t < 180000; })());
         allChats.forEach(chat => {
           if (chat.user.uid === uid) chat.user.online = online;
         });
@@ -3272,6 +3280,9 @@ function markDeliveredDocIfIncoming(docSnap, msg) {
   if (msg.receiverId === currentUser.uid && msg.senderId !== currentUser.uid) {
     // Local-first: never delete the server copy before this device has a durable copy.
     saveLocalMessage({ ...msg, id: docSnap.id });
+    getDoc(doc(db, 'users', msg.senderId)).then(u => {
+      if (u.exists()) { saveLocalContact({ ...u.data(), uid: msg.senderId }); renderChatListFromLocal(); }
+    }).catch(() => {});
     queueDeliveryAck(docSnap.id);
     if (msg.delivered !== true) {
       updateDoc(doc(db, 'messages', docSnap.id), { delivered: true })
@@ -3426,7 +3437,7 @@ async function loadChats() {
           const userData = u.exists() ? { ...u.data(), uid } : { ...localContacts[uid] };
           try {
             const oSnap = await new Promise(r => onValue(ref(rtdb, `status/${uid}`), s => r(s.val()), { onlyOnce: true }));
-            userData.online = oSnap?.online || false;
+            userData.online = oSnap?.online === true && typeof oSnap?.lastSeen === 'number' && (Date.now() - oSnap.lastSeen) < 180000;
           } catch(e) { userData.online = false; }
           cu.push({ user: userData, lastMsg: chatMap[uid] || null });
         }
@@ -3477,7 +3488,7 @@ function renderChatList(chats) {
     div.innerHTML=`
       <div class="chat-swipe-right-bg"><i class="fas fa-user-minus"></i> Remove</div>
       <div class="chat-swipe-left-bg"><i class="fas fa-broom"></i> Clear Chat</div>
-      <div class="chat-avatar chat-avatar-clickable" style="position:relative;z-index:1;"><img src="${user.photoURL||avatarUrl(user.displayName||'U',user.gender)}" /><div class="status-dot ${user.online?'':'offline'}"></div>${genderDotHTML(user.gender)}</div>
+      <div class="chat-avatar chat-avatar-clickable" style="position:relative;z-index:1;"><img src="${user.photoURL||avatarUrl(user.displayName||'U',user.gender)}" /><div class="status-dot ${user.online?'':'offline'}"></div></div>
       <div class="chat-info" style="position:relative;z-index:1;">
         <div class="chat-info-top"><span class="chat-name chat-name-clickable">${user.displayName||'User'}</span><span class="chat-time">${ts?formatTime(ts):''}</span></div>
         <div class="chat-preview">${previewText}</div>
@@ -3653,7 +3664,7 @@ function renderFriends(friends, containerId = 'friend-tab-list') {
     const infoLines = [];
     if (phoneDisplay) infoLines.push(`<small class="friend-email"><i class="fas fa-phone" style="font-size:0.6rem;margin-right:3px;"></i>${phoneDisplay}</small>`);
     if (emailDisplay) infoLines.push(`<small class="friend-email"><i class="fas fa-envelope" style="font-size:0.6rem;margin-right:3px;"></i>${emailDisplay}</small>`);
-    div.innerHTML = `<div class="chat-avatar friend-avatar-click" style="width:42px;height:42px;flex-shrink:0;cursor:pointer;"><img src="${user.photoURL||avatarUrl(user.displayName||'U',user.gender)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--border);" />${genderDotHTML(user.gender)}</div><div class="friend-info friend-name-click" style="cursor:pointer;"><div class="friend-name">${user.displayName||'User'}</div>${infoLines.join('')}</div><div class="friend-chat-btn"><i class="fas fa-comment"></i></div>`;
+    div.innerHTML = `<div class="chat-avatar friend-avatar-click" style="width:42px;height:42px;flex-shrink:0;cursor:pointer;"><img src="${user.photoURL||avatarUrl(user.displayName||'U',user.gender)}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--border);" /></div><div class="friend-info friend-name-click" style="cursor:pointer;"><div class="friend-name">${user.displayName||'User'}</div>${infoLines.join('')}</div><div class="friend-chat-btn"><i class="fas fa-comment"></i></div>`;
     div.querySelector('.friend-chat-btn').onclick=e=>{e.stopPropagation();openConversation(user);};
     div.querySelector('.friend-avatar-click').onclick=e=>{e.stopPropagation();openProfilePage(user);};
     div.querySelector('.friend-name-click').onclick=e=>{e.stopPropagation();openProfilePage(user);};
@@ -3667,28 +3678,6 @@ window.filterFriendTab = function(q) {
   renderFriends(list);
 };
 window.filterFriends = window.filterFriendTab;
-
-async function restoreMessagesRemovedFromChatList(otherUid) {
-  if (!currentUser || !otherUid) return;
-  try {
-    const q1 = query(collection(db,'messages'), where('senderId','==',currentUser.uid), where('receiverId','==',otherUid));
-    const q2 = query(collection(db,'messages'), where('senderId','==',otherUid), where('receiverId','==',currentUser.uid));
-    const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-    const updates = [];
-    [...s1.docs, ...s2.docs].forEach(d => {
-      const m = d.data();
-      if (Array.isArray(m.deletedFor) && m.deletedFor.includes(currentUser.uid)) {
-        updates.push(updateDoc(doc(db,'messages',d.id), { deletedFor: arrayRemove(currentUser.uid) }));
-      }
-    });
-    if (updates.length) {
-      await Promise.all(updates);
-      console.log('[Chat restore] Restored messages hidden by old remove bug:', updates.length);
-    }
-  } catch(e) {
-    console.warn('[Chat restore] failed:', e);
-  }
-}
 
 window.openConversationProfile = async function() {
   if (!openChatUser) return;
@@ -3706,8 +3695,6 @@ window.openConversation = function(user) {
   // closeConversation() restores the tab bar for list screens; hide it again for the chat.
   kbBridge('setNativeNavVisible', false);
   openChatUser = user;
-  saveLocalContact(user);
-  renderChatListFromLocal();
   // Opening or replying in a chat clears its matching native notification.
   if (window.AndroidBridge && user.uid) AndroidBridge.cancelNotificationForChat(user.uid);
   document.getElementById('conv-name').textContent = user.displayName||'User';
@@ -3724,34 +3711,13 @@ window.openConversation = function(user) {
   document.getElementById('typing-row').classList.remove('visible');
   document.getElementById('conv-screen').classList.add('open');
   history.pushState({ conversation: true }, '');
-  applyGenderDot(document.getElementById('conv-gender-dot'), user.gender);
   updateConvHeader(); subscribeMessages(); markRead(user.uid); listenPresence(user.uid); listenTyping(user.uid);
   _attachVoiceHold();
-  // ── Persist this contact in chatContacts (so chat list survives message deletion) ──
-  try {
-    const myContactRef = doc(db, `chatContacts/${currentUser.uid}/contacts`, user.uid);
-    getDoc(myContactRef).then(prevSnap => {
-      const prev = prevSnap.exists() ? prevSnap.data() : {};
-      const wasRemovedFromMyList = prev.removed === true || !!prev.removedAt;
-      return setDoc(myContactRef, {
-        uid: user.uid, displayName: user.displayName||'', photoURL: user.photoURL||'',
-        addedAt: serverTimestamp(), removed: false, removedAt: null
-      }, { merge: true }).then(() => {
-        // If this contact was removed from my chat list before, restore messages that were
-        // accidentally hidden by older app versions. Clear Conversation is not affected.
-        if (wasRemovedFromMyList) restoreMessagesRemovedFromChatList(user.uid);
-      });
-    }).catch(()=>{});
-    // Also persist for the other user (so they see us too), but never mark/delete their chat.
-    setDoc(doc(db, `chatContacts/${user.uid}/contacts`, currentUser.uid), {
-      uid: currentUser.uid, displayName: currentUserData?.displayName||'', photoURL: currentUserData?.photoURL||'',
-      addedAt: serverTimestamp(), removed: false
-    }, { merge: true }).catch(()=>{});
-  } catch(e) {}
   // Restore draft
   const msgInput = document.getElementById('msg-input');
   const draft = loadDraft(user.uid);
-  if (draft) { msgInput.value = draft; autoResize(msgInput); msgInputChanged(); }
+  if (draft) { msgInput.value = draft; autoResize(msgInput); }
+  msgInputChanged();
 };
 
 let privacyState = { email: false, phone: false, dobDay: false, dobMonth: false, dobYear: false };
@@ -4623,7 +4589,7 @@ window.sendMessage = async function() {
   const input=document.getElementById('msg-input'), text=input.value.trim();
   if(!text||!currentUser||!openChatUser) return;
   const recipientUid = openChatUser.uid;
-  input.value=''; autoResize(input); setMyTyping(false);
+  input.value=''; autoResize(input); setMyTyping(false); msgInputChanged();
   // Keep textarea focus before the asynchronous Firestore write begins.
   input.focus({ preventScroll: true });
   clearDraft(recipientUid);
@@ -4636,6 +4602,13 @@ window.sendMessage = async function() {
   try {
     const savedMessage = await addDoc(collection(db,'messages'), msgData);
     saveLocalMessage({ ...msgData, id: savedMessage.id });
+    saveLocalContact(openChatUser);
+    try {
+      await setDoc(doc(db, `chatContacts/${currentUser.uid}/contacts`, recipientUid), {
+        uid: recipientUid, displayName: openChatUser.displayName || '', photoURL: openChatUser.photoURL || '',
+        addedAt: serverTimestamp(), removed: false, removedAt: null
+      }, { merge: true });
+    } catch (_) {}
     renderChatListFromLocal();
     scheduleAutoBackup();
     // Keep the composer active for a fast continuous chat experience.
