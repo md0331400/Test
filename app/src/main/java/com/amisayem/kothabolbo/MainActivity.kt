@@ -2,6 +2,7 @@ package com.amisayem.kothabolbo
 
 import android.Manifest
 import android.app.DownloadManager
+import android.util.Base64
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -37,7 +38,6 @@ import com.google.android.gms.common.api.Scope
 import org.json.JSONObject
 import java.io.File
 import java.net.URL
-import java.util.Base64
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -264,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                 val target = URL(url)
                 require(target.protocol.equals("https", ignoreCase = true)) { "Only HTTPS media is allowed" }
                 val bytes = target.openStream().use { it.readBytes() }
-                val path = saveMediaToAppFolder(Base64.getEncoder().encodeToString(bytes), mediaKind, fileName)
+                val path = saveMediaToAppFolder(Base64.encodeToString(bytes, Base64.NO_WRAP), mediaKind, fileName)
                 js("window.onNativeMediaMirrored&&window.onNativeMediaMirrored(${JSONObject.quote(path)},${JSONObject.quote(mediaKind)},${JSONObject.quote(fileName)})")
             } catch (e: Exception) {
                 android.util.Log.w("KothaBolbo", "Could not mirror media to device", e)
