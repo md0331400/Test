@@ -54,6 +54,7 @@ class AndroidBridge(private val activity: MainActivity, private val permissionRe
     @JavascriptInterface fun requestPermission(permission: String) = run { permissionRequest.launch(arrayOf(permission)) }
     @JavascriptInterface fun setNativeNavVisible(visible: Boolean) = activity.setNativeNavVisible(visible)
     @JavascriptInterface fun setNativeNavTab(tab: String) = activity.setNativeNavTab(tab)
+    @JavascriptInterface fun setNativeNavColors(active: String, idle: String) = activity.setNativeNavColors(active, idle)
     @JavascriptInterface fun saveMediaToAppFolder(base64: String, mediaKind: String, fileName: String): String = activity.saveMediaToAppFolder(base64, mediaKind, fileName)
     @JavascriptInterface fun mirrorMediaToAppFolder(url: String, mediaKind: String, fileName: String) = activity.mirrorMediaToAppFolder(url, mediaKind, fileName)
     @JavascriptInterface fun camera() = run { permissionRequest.launch(arrayOf(Manifest.permission.CAMERA)) }

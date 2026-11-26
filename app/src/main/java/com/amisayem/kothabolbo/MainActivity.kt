@@ -196,9 +196,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ── Native glass tab bar ────────────────────────────────────────────────
+    private var navActiveColor = Color.parseColor("#00D4FF")
+    private var navIdleColor = Color.parseColor("#8899BB")
+    private var currentNavTab = "chat"
+
     private fun setupNativeNav() {
         val tabs = arrayOf(
             Triple("chat", R.id.navChatTab, R.id.navChatIcon to R.id.navChatLabel),
+            Triple("friend", R.id.navFriendTab, R.id.navFriendIcon to R.id.navFriendLabel),
             Triple("profile", R.id.navProfileTab, R.id.navProfileIcon to R.id.navProfileLabel),
             Triple("settings", R.id.navSettingsTab, R.id.navSettingsIcon to R.id.navSettingsLabel)
         )
@@ -215,15 +220,23 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.nativeNav)?.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
+    fun setNativeNavColors(active: String, idle: String) = runOnUiThread {
+        try {
+            navActiveColor = Color.parseColor(active)
+            navIdleColor = Color.parseColor(idle)
+            setNativeNavTab(currentNavTab)
+        } catch (_: IllegalArgumentException) {}
+    }
+
     fun setNativeNavTab(tab: String) = runOnUiThread {
-        val active = Color.parseColor("#00D4FF")
-        val idle = Color.parseColor("#8899BB")
+        currentNavTab = tab
         listOf(
             Triple("chat", R.id.navChatIcon, R.id.navChatLabel),
+            Triple("friend", R.id.navFriendIcon, R.id.navFriendLabel),
             Triple("profile", R.id.navProfileIcon, R.id.navProfileLabel),
             Triple("settings", R.id.navSettingsIcon, R.id.navSettingsLabel)
         ).forEach { (name, iconId, labelId) ->
-            val color = if (name == tab) active else idle
+            val color = if (name == tab) navActiveColor else navIdleColor
             findViewById<ImageView>(iconId)?.setColorFilter(color)
             findViewById<TextView>(labelId)?.setTextColor(color)
         }

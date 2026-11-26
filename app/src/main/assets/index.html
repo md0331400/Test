@@ -1598,6 +1598,7 @@
 .kb-sheet-field input:focus, .kb-sheet-field textarea:focus { border-color:var(--accent); }
 .kb-sheet-trigger { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
 .kb-sheet-note { font-size:.66rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px; }
+.kb-native-nav-space #edit-profile-sheet .kb-sheet-card { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
 </style>
 </head>
 
@@ -1731,17 +1732,13 @@
 
 <div id="app">
   <div class="screen active" id="chat-screen">
-    <div class="app-header">
-      <div class="header-avatar-wrap" onclick="switchTab('settings')" id="my-avatar-wrap"><img id="my-avatar" src="" class="header-avatar" /><div class="gender-dot" id="my-header-gender-dot" style="display:none;"></div></div>
-      <div class="header-info"><h2>Kotha Bolbo</h2><span id="my-name-header"></span></div>
-    </div>
-    <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="chat-search" placeholder="Search chats or find people…" oninput="filterChats(this.value)" onclick="if(!this.value.trim()){openFriendSearch();}" /></div></div>
+    <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="chat-search" placeholder="Search chats" oninput="filterChats(this.value)" /></div></div>
     <div class="scroll-area" id="chat-list-container"><div class="empty-state" id="chat-empty"><i class="fas fa-comments"></i><h3>No Chats Yet</h3><p>Tap the search bar to find people to chat with!</p></div></div>
   </div>
-  <div class="friend-search-overlay" id="friends-search-overlay">
-    <div class="app-header"><button class="header-back" onclick="closeFriendSearch()"><i class="fas fa-times"></i></button><div class="header-info"><h2>Find People</h2><span id="friends-count-text">Search friends to chat</span></div></div>
-    <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="friends-search" placeholder="Search by name or phone…" autofocus oninput="filterFriends(this.value)" /></div></div>
-    <div class="scroll-area" id="friends-list-container"><div class="empty-state"><i class="fas fa-user-friends"></i><h3>Loading…</h3></div></div>
+  <div class="screen" id="friend-screen">
+    <div class="app-header"><div class="header-info"><h2>Friends</h2><span id="friends-count-text">People on Kotha Bolbo</span></div></div>
+    <div class="search-bar"><div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="friend-tab-search" placeholder="Search people" oninput="filterFriendTab(this.value)" /></div></div>
+    <div class="scroll-area" id="friend-tab-list"><div class="empty-state"><i class="fas fa-user-friends"></i><h3>No people found</h3></div></div>
   </div>
   <div class="screen" id="settings-screen">
     <div class="app-header"><div class="header-info"><h2>Settings</h2><span>Manage your profile</span></div></div>
@@ -1778,11 +1775,6 @@
         <div class="pt-name-wrap">
           <div class="pp-name" id="pt-name"></div>
           <div id="pt-gender-badge"></div>
-        </div>
-        <div class="pt-actions">
-          <button class="btn-secondary pt-action" onclick="openEditProfile()"><i class="fas fa-user-pen"></i> Edit Profile</button>
-          <button class="btn-secondary pt-action" onclick="openAvatarUrlModal('profile')"><i class="fas fa-image"></i> Photo</button>
-          <button class="btn-secondary pt-action" onclick="openAvatarUrlModal('cover')"><i class="fas fa-images"></i> Cover</button>
         </div>
       </div>
 
@@ -3117,35 +3109,35 @@ function friendlyError(code) {
   return m[code] || 'Something went wrong. Please try again.';
 }
 
+let _activeListTab = 'chat';
 window.switchTab = function(tab) {
   if (tab === 'feed') tab = 'chat'; // Feed feature removed.
-  const target = document.getElementById(tab+'-screen');
+  const target = document.getElementById(tab + '-screen');
   if (!target) return;
   const alreadyActive = target.classList.contains('active');
 
   if (alreadyActive) {
-    if (tab === 'chat') { loadChats(); showToast('Chats refreshed'); }
-    else if (tab === 'settings') { updateUI(); populateAppVersion(); showToast('Settings refreshed'); }
+    if (tab === 'chat') { loadChats(); renderChatListFromLocal(); }
+    else if (tab === 'friend') { loadFriends(); filterFriendTab(document.getElementById('friend-tab-search')?.value || ''); }
+    else if (tab === 'settings') { updateUI(); populateAppVersion(); }
     return;
   }
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   target.classList.add('active');
+  _activeListTab = tab;
   kbBridge('setNativeNavTab', tab);
-  if (tab === 'chat') loadChats();
+  setNativeNav(true, tab);
+  if (tab === 'chat') { loadChats(); renderChatListFromLocal(); }
+  if (tab === 'friend') loadFriends();
   if (tab === 'settings') { updateUI(); populateAppVersion(); }
   if (tab === 'profile') renderOwnProfileTab();
 };
 
-window.openFriendSearch = function() {
-  closeConversation();
-  const ov=document.getElementById('friends-search-overlay'); if (!ov) return;
-  ov.classList.add('open'); loadFriends();
-  const inp=document.getElementById('friends-search'); if (inp) setTimeout(()=>{ try { inp.focus(); } catch(_){}}, 300);
-};
+// Kept as a shim: opening a conversation from any screen now just switches to Friends when asked.
+window.openFriendSearch = function() { switchTab('friend'); };
 window.closeFriendSearch = function() {
-  const ov=document.getElementById('friends-search-overlay'); if (ov) ov.classList.remove('open');
-  const inp=document.getElementById('friends-search'); if (inp) inp.value='';
+  const inp = document.getElementById('friend-tab-search'); if (inp) inp.value = '';
 };
 
 async function handleInitialChatDeepLink() {
@@ -3407,6 +3399,7 @@ async function loadChats() {
     unreadCounts = counts;
     
     // ── Load persistent contacts ──
+    const localContacts = getLocalContacts();
     let removedUids = new Set();
     let savedContactUids = new Set();
     try {
@@ -3423,13 +3416,14 @@ async function loadChats() {
       if (uid !== currentUser.uid && !removedUids.has(uid)) contactUids.add(uid);
     });
     savedContactUids.forEach(uid => { if (uid !== currentUser.uid) contactUids.add(uid); });
+    Object.keys(localContacts).forEach(uid => { if (uid !== currentUser.uid && !removedUids.has(uid)) contactUids.add(uid); });
 
     const cu = [];
     for (const uid of contactUids) {
       try {
         const u = await getDoc(doc(db, 'users', uid));
-        if (u.exists()) {
-          const userData = u.data();
+        if (u.exists() || localContacts[uid]) {
+          const userData = u.exists() ? { ...u.data(), uid } : { ...localContacts[uid] };
           try {
             const oSnap = await new Promise(r => onValue(ref(rtdb, `status/${uid}`), s => r(s.val()), { onlyOnce: true }));
             userData.online = oSnap?.online || false;
@@ -3554,7 +3548,37 @@ function renderChatList(chats) {
   });
 }
 
-window.filterChats = function(q) { renderChatList(allChats.filter(({user})=>(user.displayName||'').toLowerCase().includes(q.toLowerCase()))); };
+const LOCAL_CONTACTS_KEY = () => 'kb_local_contacts_' + (currentUser?.uid || '');
+function getLocalContacts() {
+  try { const v = JSON.parse(localStorage.getItem(LOCAL_CONTACTS_KEY()) || '{}'); return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; }
+  catch (_) { return {}; }
+}
+function saveLocalContact(user) {
+  if (!currentUser || !user || !user.uid || user.uid === currentUser.uid) return;
+  const map = getLocalContacts();
+  map[user.uid] = { uid: user.uid, displayName: user.displayName || 'User', photoURL: user.photoURL || '', gender: user.gender || '' };
+  try { localStorage.setItem(LOCAL_CONTACTS_KEY(), JSON.stringify(map)); } catch (_) {}
+}
+function lastLocalMessageFor(uid) {
+  if (!currentUser) return null;
+  return getRestoredMessages()
+    .filter(m => m && ((m.senderId === currentUser.uid && m.receiverId === uid) || (m.senderId === uid && m.receiverId === currentUser.uid)))
+    .sort((a, b) => (b.timestamp?.seconds || b.clientCreatedAt || 0) - (a.timestamp?.seconds || a.clientCreatedAt || 0))[0] || null;
+}
+function renderChatListFromLocal() {
+  if (!currentUser) return;
+  const map = new Map((allChats || []).filter(c => c?.user?.uid).map(c => [c.user.uid, c]));
+  Object.values(getLocalContacts()).forEach(user => {
+    if (user.uid === currentUser.uid || map.has(user.uid)) return;
+    map.set(user.uid, { user, lastMsg: lastLocalMessageFor(user.uid) });
+  });
+  allChats = Array.from(map.values());
+  renderChatList(allChats);
+}
+window.filterChats = function(q) {
+  const ql = q.toLowerCase().trim();
+  renderChatList(allChats.filter(({user}) => (user.displayName || '').toLowerCase().includes(ql) || (user.phone || '').toLowerCase().includes(ql)));
+};
 
 window.loadFriends = async function() {
   const icon=document.getElementById('friends-refresh-icon');
@@ -3617,8 +3641,8 @@ function formatBirthdayParts(user, privacy) {
   return parts.join(' ');
 }
 
-function renderFriends(friends) {
-  const c=document.getElementById('friends-list-container'); c.innerHTML='';
+function renderFriends(friends, containerId = 'friend-tab-list') {
+  const c=document.getElementById(containerId); if (!c) return; c.innerHTML='';
   if (!friends.length) { c.innerHTML='<div class="empty-state"><i class="fas fa-user-slash"></i><h3>No Users Found</h3></div>'; return; }
   friends.forEach(user=>{
     const div=document.createElement('div'); div.className='friend-item';
@@ -3637,7 +3661,12 @@ function renderFriends(friends) {
   });
 }
 
-window.filterFriends = function(q) { const ql=q.toLowerCase().trim(); if(!ql) { renderFriends(allFriends); return; } renderFriends(allFriends.filter(u=>(u.displayName||'').toLowerCase().includes(ql)||(u.phone||'').toLowerCase().includes(ql))); };
+window.filterFriendTab = function(q) {
+  const ql = q.toLowerCase().trim();
+  const list = !ql ? allFriends : allFriends.filter(u => (u.displayName || '').toLowerCase().includes(ql) || (u.phone || '').toLowerCase().includes(ql));
+  renderFriends(list);
+};
+window.filterFriends = window.filterFriendTab;
 
 async function restoreMessagesRemovedFromChatList(otherUid) {
   if (!currentUser || !otherUid) return;
@@ -3677,6 +3706,8 @@ window.openConversation = function(user) {
   // closeConversation() restores the tab bar for list screens; hide it again for the chat.
   kbBridge('setNativeNavVisible', false);
   openChatUser = user;
+  saveLocalContact(user);
+  renderChatListFromLocal();
   // Opening or replying in a chat clears its matching native notification.
   if (window.AndroidBridge && user.uid) AndroidBridge.cancelNotificationForChat(user.uid);
   document.getElementById('conv-name').textContent = user.displayName||'User';
@@ -3863,7 +3894,7 @@ window.closeConversation = function() {
   if(typingUnsubscribe){typingUnsubscribe();typingUnsubscribe=null;}
   clearTimeout(typingTimeout); clearTimeout(typingDebounce);
   openChatUser=null;
-  setNativeNav(true);
+  setNativeNav(true, _activeListTab);
 };
 
 let renderedMsgIds = new Set();
@@ -4605,6 +4636,7 @@ window.sendMessage = async function() {
   try {
     const savedMessage = await addDoc(collection(db,'messages'), msgData);
     saveLocalMessage({ ...msgData, id: savedMessage.id });
+    renderChatListFromLocal();
     scheduleAutoBackup();
     // Keep the composer active for a fast continuous chat experience.
     // Keep the already-visible keyboard stable; invoking Android's keyboard API here caused a visible blink.
@@ -4633,10 +4665,12 @@ window.openEditProfileSheet = function() {
   const y = u.birthYear, m = u.birthMonth, d = u.birthDay;
   set('kb-sheet-birthday', (y && m && d) ? `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}` : '');
   document.getElementById('edit-profile-sheet').classList.add('open');
+  kbBridge('setNativeNavVisible', false);
 };
 window.closeEditProfileSheet = function() {
   const el = document.getElementById('edit-profile-sheet');
   if (el) el.classList.remove('open');
+  setNativeNav(true, _activeListTab);
 };
 window.saveEditProfileSheet = function() {
   const name = document.getElementById('kb-sheet-name').value.trim();
@@ -5164,6 +5198,11 @@ function applyTheme(key) {
   if (appearanceSwitch) appearanceSwitch.style.background = _appearanceMode === 'light' ? 'var(--accent)' : 'var(--bg-input)';
   if (appearanceKnob) { appearanceKnob.style.transform = _appearanceMode === 'light' ? 'translateX(19px)' : 'translateX(0)'; appearanceKnob.style.background = _appearanceMode === 'light' ? '#fff' : 'var(--text-secondary)'; }
   updateThemePopupSelection();
+  try {
+    const cs = getComputedStyle(root);
+    const pick = (name, fallback) => { const v = (cs.getPropertyValue(name) || '').trim(); return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v) ? v : fallback; };
+    kbBridge('setNativeNavColors', pick('--accent', '#00d4ff'), pick('--text-muted', '#8899bb'));
+  } catch (_) {}
 }
 
 function ensureThemePopup() {
